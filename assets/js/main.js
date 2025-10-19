@@ -55,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const contactForm = document.getElementById('contactForm');
   const quoteForm = document.getElementById('quoteForm');
+  const careersForm = document.getElementById('careersForm');
   const quoteTypeSelect = document.getElementById('quoteType');
   const quoteServiceSelect = document.getElementById('quoteService');
 
@@ -228,6 +229,57 @@ document.addEventListener('DOMContentLoaded', () => {
         showErrorMessage('Sorry, there was an issue sending your quote request. Please try again or contact us directly at enquiries@relypro.co.uk or +44 7796 584056.');
       } finally {
         // Restore button state
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      }
+    });
+  }
+
+  /**
+   * Careers form -> send via WhatsApp
+   */
+  if (careersForm) {
+    careersForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const submitBtn = careersForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Sending...';
+      submitBtn.disabled = true;
+
+      try {
+        const formData = {
+          name: document.getElementById('careerName').value.trim(),
+          email: document.getElementById('careerEmail').value.trim(),
+          phone: document.getElementById('careerPhone').value.trim(),
+          role: document.getElementById('careerRole').value,
+          availability: document.getElementById('careerAvailability').value.trim(),
+          notes: document.getElementById('careerNotes').value.trim(),
+          businessPhone: '+447796584056',
+          formType: 'careers'
+        };
+
+        const whatsappMessage = `*RelyPro - New Careers Application*\n\n` +
+          `👤 *Name:* ${formData.name}\n` +
+          `📧 *Email:* ${formData.email}\n` +
+          `📱 *Phone:* ${formData.phone}\n` +
+          `🧰 *Role:* ${formData.role}\n` +
+          `🗓️ *Availability:* ${formData.availability}\n` +
+          `📝 *Notes:* ${formData.notes || 'None'}\n\n` +
+          `⏰ *Submitted:* ${new Date().toLocaleString()}`;
+
+        const response = await sendToWhatsApp(whatsappMessage, formData.businessPhone);
+
+        if (response.success) {
+          showSuccessMessage('Thanks for applying! We\'ll review your details and get back to you shortly.');
+          careersForm.reset();
+        } else {
+          throw new Error('Failed to send application');
+        }
+      } catch (error) {
+        console.error('Error sending careers form:', error);
+        showErrorMessage('Sorry, there was an issue sending your application. Please try again or email careers@relypro.co.uk.');
+      } finally {
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
       }
