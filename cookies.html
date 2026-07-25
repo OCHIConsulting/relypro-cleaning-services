@@ -6,7 +6,7 @@
     <meta name="description" content="The essential storage and optional analytics technologies used on the RelyPro Cleaning Services website, including how to change your preference." />
     <link rel="canonical" href="https://relypro.co.uk/cookies.html" />
     <meta property="og:type" content="website" /><meta property="og:site_name" content="RelyPro" /><meta property="og:title" content="Cookie Notice | RelyPro" /><meta property="og:description" content="How RelyPro uses essential storage and optional analytics." /><meta property="og:url" content="https://relypro.co.uk/cookies.html" />
-    <meta name="referrer" content="strict-origin-when-cross-origin" /><meta name="relypro-ga4-id" content="" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" /><meta name="relypro-ga4-id" content="G-M2JVHYSZ9D" />
     <link rel="icon" href="assets/images/favicon.png" type="image/png" /><link rel="stylesheet" href="assets/css/bootstrap.relypro.min.css" /><link rel="stylesheet" href="assets/vendor/fontawesome/css/relypro-icons.min.css" /><link rel="stylesheet" href="assets/css/style.css" />
     <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://relypro.co.uk/"},{"@type":"ListItem","position":2,"name":"Cookie notice","item":"https://relypro.co.uk/cookies.html"}]}</script>
   </head>
@@ -25,21 +25,25 @@
         <h2>Essential storage</h2>
         <p>Essential storage supports functions you request and does not require analytics consent:</p>
         <ul>
-          <li><strong>relyproConsent:</strong> local storage that remembers whether you selected essential-only or allowed analytics, including the date of the choice. It remains until you clear site data or reset the preference.</li>
+          <li><strong>relyproConsent:</strong> local storage that remembers whether you selected essential-only or allowed analytics, including the date of the choice. The preference expires after 180 days, when you will be asked again, or sooner if you clear site data or reset the preference.</li>
           <li><strong>relyproCampaign:</strong> session storage that temporarily remembers campaign parameters such as UTM source during the current browser session so a quote handoff can retain its source. It is removed when the browser session ends.</li>
         </ul>
         <h2>Optional analytics</h2>
-        <p>The site contains a consent-aware analytics integration. Analytics is loaded only after you choose “Allow analytics” and only when RelyPro has configured a valid analytics account ID. Analytics may measure page path, quote starts, selected service, contact-button clicks, campaign source and WhatsApp handoffs. We do not intentionally send the contents of form fields, full postcodes, names, phone numbers, email addresses or message text to analytics.</p>
+        <p>The site uses Google Analytics only after you choose “Allow analytics”. Google Analytics may measure page path, quote starts, selected service, contact-button clicks, campaign source and WhatsApp handoffs. We do not intentionally send the contents of form fields, full postcodes, names, phone numbers, email addresses or message text to analytics. Advertising storage, advertising personalisation and Google Signals are disabled.</p>
+        <ul>
+          <li><strong>_ga:</strong> used by Google Analytics to distinguish visitors. Its default lifetime is up to two years after consent, subject to browser limits and configuration.</li>
+          <li><strong>_ga_&lt;container-id&gt;:</strong> used by Google Analytics to maintain session state. Its default lifetime is up to two years after consent, subject to browser limits and configuration.</li>
+        </ul>
         <h2>Links to other services</h2>
         <p>Clicking phone, email, WhatsApp or external links may open another application or website. Those services may use their own cookies or similar technologies under their notices. RelyPro’s website does not silently submit a completed form to WhatsApp; it opens a prepared message for you to review and send.</p>
         <h2>Change your choice</h2>
-        <p>You can reset the website preference below. Your browser settings can also delete or block site data. Blocking essential storage may cause the preference banner to appear again.</p>
+        <p>You can withdraw analytics consent and reset the website preference below. This removes Google Analytics cookies accessible to this website and shows the preference banner again. You can also use your browser settings to delete or block site data; blocking essential storage may cause the preference banner to reappear.</p>
         <button type="button" id="resetConsent" class="btn btn-primary">Reset cookie preference</button>
         <h2>Contact</h2>
         <p>Questions about this notice can be sent to <a href="mailto:enquiries@relypro.co.uk">enquiries@relypro.co.uk</a>. See the <a href="privacy.html">privacy notice</a> for information about personal data and your rights.</p>
       </div></section>
     </main>
     <footer class="footer-bg text-white py-4"><div class="container text-center small"><p class="mb-1"><a href="tel:+447796584056">+44 7796 584056</a> | <a href="mailto:enquiries@relypro.co.uk">enquiries@relypro.co.uk</a></p><nav class="footer-links" aria-label="Footer"><a href="areas.html">Areas covered</a><a href="privacy.html">Privacy</a><a href="cookies.html">Cookies</a><a href="terms.html">Booking terms</a></nav><p class="mb-0"><strong>© <span data-current-year>2026</span> RelyPro Cleaning Services</strong></p></div></footer>
-    <script src="assets/js/main.js?v=20260725-1"></script>
+    <script src="assets/js/main.js?v=20260725-analytics"></script>
   </body>
 </html>

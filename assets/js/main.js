@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const BUSINESS_EMAIL = 'enquiries@relypro.co.uk';
   const CONSENT_KEY = 'relyproConsent';
   const CAMPAIGN_KEY = 'relyproCampaign';
+  const CONSENT_MAX_AGE_MS = 180 * 24 * 60 * 60 * 1000;
 
   const header = document.getElementById('header');
   const setHeaderState = () => {
@@ -92,6 +93,29 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  const clearAnalyticsCookies = () => {
+    const analyticsCookiePattern = /^(_ga|_gid|_gat|_gac_|_gcl_)/i;
+    const cookieNames = document.cookie
+      .split(';')
+      .map((cookie) => cookie.split('=')[0].trim())
+      .filter((name) => analyticsCookiePattern.test(name));
+    const hostname = window.location.hostname;
+    const domains = new Set(['', hostname, `.${hostname}`]);
+
+    if (hostname === 'relypro.co.uk' || hostname.endsWith('.relypro.co.uk')) {
+      domains.add('relypro.co.uk');
+      domains.add('.relypro.co.uk');
+    }
+
+    cookieNames.forEach((name) => {
+      domains.forEach((domain) => {
+        const domainAttribute = domain ? `; domain=${domain}` : '';
+        document.cookie = `${name}=; Max-Age=0; path=/${domainAttribute}; SameSite=Lax`;
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/${domainAttribute}; SameSite=Lax`;
+      });
+    });
+  };
+
   const query = new URLSearchParams(window.location.search);
   const campaignFromUrl = {};
   ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'gclid'].forEach((key) => {
@@ -110,25 +134,68 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const campaign = readStoredJson(sessionStorage, CAMPAIGN_KEY);
-  let consent = readStoredJson(localStorage, CONSENT_KEY, { essential: true, analytics: false });
+  const readConsent = () => {
+    const storedConsent = readStoredJson(localStorage, CONSENT_KEY, null);
+    const updatedAt = storedConsent && Date.parse(storedConsent.updated_at);
+    const isCurrent =
+      storedConsent &&
+      storedConsent.essential === true &&
+      Number.isFinite(updatedAt) &&
+      Date.now() - updatedAt <= CONSENT_MAX_AGE_MS;
+
+    if (!isCurrent) {
+      localStorage.removeItem(CONSENT_KEY);
+      clearAnalyticsCookies();
+      return { essential: true, analytics: false };
+    }
+
+    return storedConsent;
+  };
+  let consent = readConsent();
 
   const analyticsMeta = document.querySelector('meta[name="relypro-ga4-id"]');
   const analyticsId = analyticsMeta ? analyticsMeta.content.trim() : '';
   let analyticsLoaded = false;
+
+  const initialiseGoogleTag = () => {
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = window.gtag || function gtag() {
+      window.dataLayer.push(arguments);
+    };
+  };
+
+  const updateGoogleConsent = (analyticsGranted) => {
+    if (typeof window.gtag !== 'function') {
+      return;
+    }
+
+    window.gtag('consent', 'update', {
+      analytics_storage: analyticsGranted ? 'granted' : 'denied',
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied'
+    });
+  };
 
   const loadAnalytics = () => {
     if (!consent.analytics || analyticsLoaded || !/^G-[A-Z0-9]+$/i.test(analyticsId)) {
       return;
     }
 
-    window.dataLayer = window.dataLayer || [];
-    window.gtag = window.gtag || function gtag() {
-      window.dataLayer.push(arguments);
-    };
+    initialiseGoogleTag();
+    window.gtag('consent', 'default', {
+      analytics_storage: 'denied',
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied'
+    });
+    updateGoogleConsent(true);
+    window.gtag('set', 'ads_data_redaction', true);
     window.gtag('js', new Date());
     window.gtag('config', analyticsId, {
       anonymize_ip: true,
-      allow_google_signals: false
+      allow_google_signals: false,
+      allow_ad_personalization_signals: false
     });
 
     const script = document.createElement('script');
@@ -194,7 +261,14 @@ document.addEventListener('DOMContentLoaded', () => {
       };
       localStorage.setItem(CONSENT_KEY, JSON.stringify(consent));
       banner.remove();
-      loadAnalytics();
+
+      if (consent.analytics) {
+        loadAnalytics();
+      } else {
+        updateGoogleConsent(false);
+        clearAnalyticsCookies();
+      }
+
       trackEvent('consent_update', { analytics_storage: consent.analytics ? 'granted' : 'denied' });
     });
 
@@ -205,6 +279,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const resetConsent = document.getElementById('resetConsent');
   if (resetConsent) {
     resetConsent.addEventListener('click', () => {
+      consent = { essential: true, analytics: false, updated_at: new Date().toISOString() };
+      updateGoogleConsent(false);
+      clearAnalyticsCookies();
       localStorage.removeItem(CONSENT_KEY);
       window.location.reload();
     });

@@ -17,14 +17,22 @@ for the verified Google account.
 
 ## 2. Analytics activation
 
-Each page contains:
+Each page now contains the active GA4 web-stream ID:
 
 ```html
-<meta name="relypro-ga4-id" content="" />
+<meta name="relypro-ga4-id" content="G-M2JVHYSZ9D" />
 ```
 
-Replace the empty value with the real GA4 web-stream ID, for example `G-ABC1234567`.
-The script will load analytics only after the visitor allows analytics.
+The script uses basic consent: it does not request Google Analytics until the visitor
+chooses “Allow analytics”. The preference expires after 180 days. Advertising
+storage, advertising personalisation and Google Signals remain disabled, and
+withdrawing consent removes accessible Google Analytics cookies.
+
+After deployment:
+
+1. Accept analytics on the live site and confirm the visit in GA4 Realtime or DebugView.
+2. Mark the business-critical events below as key events in GA4.
+3. Create any service or campaign custom dimensions required for regular reporting.
 
 Implemented events:
 

@@ -48,7 +48,7 @@ Because the site is static, it records a `quote_handoff` when WhatsApp opens—n
 
 ## Analytics and Search Setup
 
-Set the GA4 measurement ID in each page's `relypro-ga4-id` meta tag when the property is ready. Analytics loads only after the visitor selects “Allow analytics.”
+GA4 measurement ID `G-M2JVHYSZ9D` is configured across the site. Analytics loads only after the visitor selects “Allow analytics”; the preference expires after 180 days, advertising features remain denied, and the cookie-notice reset control withdraws consent and removes accessible Google Analytics cookies.
 
 See `SEO-OPERATIONS.md` for Search Console submission, conversion events, Google Business Profile and citation checks, and the account-level information still required before launch.
 
