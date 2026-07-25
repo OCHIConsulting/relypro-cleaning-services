@@ -1,11 +1,15 @@
 # RelyPro Cleaning Services Website
 
-A responsive static website for RelyPro Cleaning Services, featuring a fullscreen video hero, trust metrics, service overviews, a pricing section, testimonials, FAQs, and a high-conversion CTA with a custom collage background.
+A responsive static sales and local-search website for RelyPro Cleaning Services in Derby.
 
 ## Overview
-- Pages: `index.html`, `services.html`, `about.html`, `contact.html`, `get-quote.html`
-- Assets: CSS in `assets/css/style.css`, JS in `assets/js/main.js`, images in `assets/images`, and hero video in `assets/videos/hero.mp4`.
-- Libraries: Bootstrap 5.3, Font Awesome 6, Google Fonts (Poppins)
+
+- Core pages: `index.html`, `services.html`, `about.html`, `contact.html`, `get-quote.html`, and `careers.html`.
+- Commercial landing pages: Airbnb and holiday-let turnovers, deep cleaning, end-of-tenancy cleaning, office cleaning, and carpet cleaning in Derby.
+- Supporting pages: service areas, privacy, cookies, and booking terms.
+- Local Bootstrap and Font Awesome assets; no third-party font or CSS dependency.
+- Optimized WebP imagery, a compact hero video, reduced-motion support, and mobile conversion controls.
+- Page-specific search metadata, structured data, `robots.txt`, and `sitemap.xml`.
 
 ## Local Preview
 You can open `index.html` directly in a browser, but using a tiny static server is better for consistent asset paths.
@@ -19,7 +23,8 @@ python -m http.server 8000
 On Windows without Python, consider installing the "Live Server" VS Code extension or use Node’s http-server.
 
 ## Deployment
-This is a static site—no build step required. Two recommended options:
+
+This is a static site—no build step is required.
 
 ### Option A: GitHub Pages (simple & free)
 1. Push this repo to GitHub on the `main` branch.
@@ -33,43 +38,55 @@ This is a static site—no build step required. Two recommended options:
 2. Framework preset: None. Build command: none. Output directory: `/`.
 3. Add your custom domain in the project → it will guide DNS.
 
-> Tip: If `assets/videos/hero.mp4` is large or traffic-heavy, host it on an object store/CDN (e.g., Cloudflare R2) and update the `<source>` URL for lower egress costs.
+The included `_headers` file configures security and cache headers on hosts that support the Netlify/Cloudflare Pages headers format. GitHub Pages ignores this file; use Cloudflare in front of GitHub Pages or a host with configurable response headers.
 
 ## Forms & Messaging
-The contact and quote forms are wired to send details via WhatsApp using CallMeBot in `assets/js/main.js`.
-- Update the API key and phone number to production-ready values.
-- Consider adding a server-side endpoint or third-party form service for reliability and record-keeping.
 
-## Accessibility & SEO
-- Uses semantic HTML and accessible labels for form fields.
-- Add/verify unique `<title>` and meta descriptions per page.
-- Consider Open Graph/Twitter card tags for better link previews.
+The quote, contact, and careers forms create a pre-filled WhatsApp message and explicitly ask the visitor to review and send it. No form data is sent silently to an unverified third-party endpoint.
+
+Because the site is static, it records a `quote_handoff` when WhatsApp opens—not a verified lead submission. Use a consent-aware server-side form or CRM integration if verified submissions, lead stages, and revenue attribution are required.
+
+## Analytics and Search Setup
+
+GA4 measurement ID `G-M2JVHYSZ9D` is configured across the site. Analytics loads only after the visitor selects “Allow analytics”; the preference expires after 180 days, advertising features remain denied, and the cookie-notice reset control withdraws consent and removes accessible Google Analytics cookies.
+
+See `SEO-OPERATIONS.md` for Search Console submission, conversion events, Google Business Profile and citation checks, and the account-level information still required before launch.
 
 ## Maintenance
 - Shared UI (header/footer) currently lives in each HTML file. To reduce duplication, consider migrating to a light static site generator (e.g., Eleventy) with layouts/partials, compiling back to static HTML for deploy.
-- Keep images optimized (target ≤ 200 KB where possible). Use WebP for further gains where practical.
+- Keep images optimized (target ≤ 200 KB where practical) and include explicit width and height attributes.
 
 ## Project Structure
 ```
-relypro/
+relypro-cleaning-services/
 ├── index.html
 ├── about.html
 ├── contact.html
 ├── services.html
 ├── get-quote.html
+├── careers.html
+├── *-cleaning-derby.html
+├── areas.html
+├── privacy.html
+├── cookies.html
+├── terms.html
+├── robots.txt
+├── sitemap.xml
+├── _headers
 ├── assets/
 │   ├── css/
+│   │   ├── bootstrap.relypro.min.css
 │   │   └── style.css
 │   ├── js/
 │   │   └── main.js
 │   ├── images/
-│   └── videos/
+│   ├── videos/
+│   └── vendor/
+├── SEO-OPERATIONS.md
 └── README.md
 ```
 
 ## Credits
-- Bootstrap, Font Awesome, Google Fonts.
-- Images and video assets belong to RelyPro (replace or attribute as needed).
 
----
-If you want, I can also add a GitHub Pages-ready `CNAME` file and a one-command deploy workflow. 
+- Bootstrap and Font Awesome.
+- Images and video assets belong to RelyPro (replace or attribute as needed).
