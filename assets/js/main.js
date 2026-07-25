@@ -1,412 +1,453 @@
 /*
- * Main JavaScript for RelyPro Cleaning Services
+ * RelyPro site behaviour
  *
- * Handles navbar colour changes on scroll and sends form data to WhatsApp
- * when quote or contact forms are submitted.
+ * Provides accessible navigation/media controls, consent-aware analytics,
+ * campaign attribution, service preselection and explicit WhatsApp hand-offs.
  */
 
-// Change navbar background on scroll
-window.addEventListener('scroll', () => {
-  const header = document.getElementById('header');
-  if (window.scrollY > 60) {
-    header.classList.add('scrolled');
-  } else {
-    header.classList.remove('scrolled');
-  }
-});
-
-// Wait for DOM to load before attaching form handlers
 document.addEventListener('DOMContentLoaded', () => {
-  
-  // Handle dropdown placeholder styling
-  const handleDropdownStyling = () => {
-    const dropdowns = ['quoteType', 'quoteService'];
-    
-    dropdowns.forEach(id => {
-      const select = document.getElementById(id);
-      if (select) {
-        // Initial styling for placeholder
-        if (select.value === '' || select.selectedIndex === 0) {
-          select.style.color = '#9ca3af';
-          select.style.fontSize = '0.875rem';
-          select.style.fontWeight = '400';
-        }
-        
-        // Add change event listener
-        select.addEventListener('change', function() {
-          if (this.value === '' || this.selectedIndex === 0) {
-            // Placeholder selected
-            this.style.color = '#9ca3af';
-            this.style.fontSize = '0.875rem';
-            this.style.fontWeight = '400';
-          } else {
-            // Real option selected
-            this.style.color = '#374151';
-            this.style.fontSize = '0.9rem';
-            this.style.fontWeight = '500';
+  const BUSINESS_PHONE = '447796584056';
+  const BUSINESS_EMAIL = 'enquiries@relypro.co.uk';
+  const CONSENT_KEY = 'relyproConsent';
+  const CAMPAIGN_KEY = 'relyproCampaign';
+
+  const header = document.getElementById('header');
+  const setHeaderState = () => {
+    if (header) {
+      header.classList.toggle('scrolled', window.scrollY > 60);
+    }
+  };
+  setHeaderState();
+  window.addEventListener('scroll', setHeaderState, { passive: true });
+
+  document.querySelectorAll('[data-bs-toggle="collapse"]').forEach((button) => {
+    const selector = button.getAttribute('data-bs-target');
+    const target = selector && selector.startsWith('#') ? document.querySelector(selector) : null;
+    if (!target) {
+      return;
+    }
+
+    button.addEventListener('click', () => {
+      const parentSelector = target.getAttribute('data-bs-parent');
+      if (parentSelector) {
+        document.querySelectorAll(`${parentSelector} .accordion-collapse.show`).forEach((openPanel) => {
+          if (openPanel === target) {
+            return;
+          }
+          openPanel.classList.remove('show');
+          const control = document.querySelector(`[aria-controls="${openPanel.id}"]`);
+          if (control) {
+            control.classList.add('collapsed');
+            control.setAttribute('aria-expanded', 'false');
           }
         });
       }
+
+      const willOpen = !target.classList.contains('show');
+      target.classList.toggle('show', willOpen);
+      button.classList.toggle('collapsed', !willOpen);
+      button.setAttribute('aria-expanded', String(willOpen));
+    });
+  });
+
+  document.querySelectorAll('.navbar-collapse a').forEach((link) => {
+    link.addEventListener('click', () => {
+      const nav = link.closest('.navbar-collapse');
+      const toggle = nav && document.querySelector(`[aria-controls="${nav.id}"]`);
+      if (nav && toggle && window.matchMedia('(max-width: 991.98px)').matches) {
+        nav.classList.remove('show');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+  });
+
+  document.querySelectorAll('[data-bs-slide]').forEach((control) => {
+    control.addEventListener('click', () => {
+      const selector = control.getAttribute('data-bs-target');
+      const carousel = selector && selector.startsWith('#') ? document.querySelector(selector) : null;
+      if (!carousel) {
+        return;
+      }
+      const items = Array.from(carousel.querySelectorAll('.carousel-item'));
+      const activeIndex = items.findIndex((item) => item.classList.contains('active'));
+      if (activeIndex < 0 || items.length < 2) {
+        return;
+      }
+      const direction = control.getAttribute('data-bs-slide') === 'prev' ? -1 : 1;
+      const nextIndex = (activeIndex + direction + items.length) % items.length;
+      items[activeIndex].classList.remove('active');
+      items[nextIndex].classList.add('active');
+    });
+  });
+
+  document.querySelectorAll('[data-current-year]').forEach((element) => {
+    element.textContent = String(new Date().getFullYear());
+  });
+
+  const readStoredJson = (storage, key, fallback = {}) => {
+    try {
+      return JSON.parse(storage.getItem(key) || JSON.stringify(fallback));
+    } catch {
+      return fallback;
+    }
+  };
+
+  const query = new URLSearchParams(window.location.search);
+  const campaignFromUrl = {};
+  ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'gclid'].forEach((key) => {
+    const value = query.get(key);
+    if (value) {
+      campaignFromUrl[key] = value.slice(0, 200);
+    }
+  });
+
+  if (Object.keys(campaignFromUrl).length) {
+    sessionStorage.setItem(CAMPAIGN_KEY, JSON.stringify({
+      ...campaignFromUrl,
+      landing_page: window.location.pathname,
+      captured_at: new Date().toISOString()
+    }));
+  }
+
+  const campaign = readStoredJson(sessionStorage, CAMPAIGN_KEY);
+  let consent = readStoredJson(localStorage, CONSENT_KEY, { essential: true, analytics: false });
+
+  const analyticsMeta = document.querySelector('meta[name="relypro-ga4-id"]');
+  const analyticsId = analyticsMeta ? analyticsMeta.content.trim() : '';
+  let analyticsLoaded = false;
+
+  const loadAnalytics = () => {
+    if (!consent.analytics || analyticsLoaded || !/^G-[A-Z0-9]+$/i.test(analyticsId)) {
+      return;
+    }
+
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = window.gtag || function gtag() {
+      window.dataLayer.push(arguments);
+    };
+    window.gtag('js', new Date());
+    window.gtag('config', analyticsId, {
+      anonymize_ip: true,
+      allow_google_signals: false
+    });
+
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(analyticsId)}`;
+    document.head.appendChild(script);
+    analyticsLoaded = true;
+  };
+
+  const trackEvent = (name, parameters = {}) => {
+    const detail = {
+      ...campaign,
+      ...parameters,
+      page_path: window.location.pathname
+    };
+
+    window.dispatchEvent(new CustomEvent('relypro:analytics', {
+      detail: { name, parameters: detail }
+    }));
+
+    if (!consent.analytics) {
+      return;
+    }
+
+    loadAnalytics();
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', name, detail);
+    }
+  };
+
+  window.relyproAnalytics = { trackEvent };
+  loadAnalytics();
+
+  const showConsentBanner = () => {
+    if (localStorage.getItem(CONSENT_KEY)) {
+      return;
+    }
+
+    const banner = document.createElement('aside');
+    banner.className = 'cookie-banner';
+    banner.setAttribute('aria-label', 'Cookie preferences');
+    banner.innerHTML = `
+      <div>
+        <strong>Your privacy matters</strong>
+        <p class="mb-0">We use essential storage for site preferences. With your permission, analytics helps us understand which enquiries lead to bookings. <a href="cookies.html">Cookie notice</a></p>
+      </div>
+      <div class="cookie-banner__actions">
+        <button type="button" class="btn btn-outline-light btn-sm" data-consent="essential">Essential only</button>
+        <button type="button" class="btn btn-light btn-sm" data-consent="analytics">Allow analytics</button>
+      </div>
+    `;
+
+    banner.addEventListener('click', (event) => {
+      const button = event.target.closest('[data-consent]');
+      if (!button) {
+        return;
+      }
+
+      consent = {
+        essential: true,
+        analytics: button.dataset.consent === 'analytics',
+        updated_at: new Date().toISOString()
+      };
+      localStorage.setItem(CONSENT_KEY, JSON.stringify(consent));
+      banner.remove();
+      loadAnalytics();
+      trackEvent('consent_update', { analytics_storage: consent.analytics ? 'granted' : 'denied' });
+    });
+
+    document.body.appendChild(banner);
+  };
+  showConsentBanner();
+
+  const resetConsent = document.getElementById('resetConsent');
+  if (resetConsent) {
+    resetConsent.addEventListener('click', () => {
+      localStorage.removeItem(CONSENT_KEY);
+      window.location.reload();
+    });
+  }
+
+  const addMobileConversionBar = () => {
+    const bar = document.createElement('nav');
+    bar.className = 'mobile-conversion-bar';
+    bar.setAttribute('aria-label', 'Quick contact');
+    bar.innerHTML = `
+      <a href="tel:+447796584056" data-track="phone_click"><i class="fa-solid fa-phone" aria-hidden="true"></i><span>Call</span></a>
+      <a href="https://wa.me/${BUSINESS_PHONE}" data-track="whatsapp_click"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i><span>WhatsApp</span></a>
+      <a href="get-quote.html" data-track="quote_click"><i class="fa-solid fa-file-signature" aria-hidden="true"></i><span>Get quote</span></a>
+    `;
+    document.body.appendChild(bar);
+  };
+  addMobileConversionBar();
+
+  document.addEventListener('click', (event) => {
+    const link = event.target.closest('a[href]');
+    if (!link) {
+      return;
+    }
+
+    const href = link.getAttribute('href') || '';
+    const eventName =
+      link.dataset.track ||
+      (href.startsWith('tel:') ? 'phone_click' :
+        href.startsWith('mailto:') ? 'email_click' :
+          href.includes('wa.me') ? 'whatsapp_click' :
+            href.includes('get-quote') ? 'quote_click' : '');
+
+    if (eventName) {
+      trackEvent(eventName, {
+        link_url: href,
+        link_text: (link.textContent || '').trim().slice(0, 100)
+      });
+    }
+  });
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const hero = document.getElementById('hero');
+  const heroVideo = document.getElementById('heroVideo');
+  const videoToggle = document.getElementById('heroVideoToggle');
+  const videoToggleLabel = videoToggle?.querySelector('[data-video-toggle-label]');
+  const videoToggleIcon = videoToggle?.querySelector('i');
+
+  const updateVideoButtonState = () => {
+    if (!heroVideo || !videoToggle || !videoToggleLabel || !videoToggleIcon) {
+      return;
+    }
+
+    const action = heroVideo.paused ? 'Play' : 'Pause';
+    const label = `${action} background video`;
+    videoToggleLabel.textContent = label;
+    videoToggle.setAttribute('aria-label', label);
+    videoToggleIcon.className = heroVideo.paused
+      ? 'fa-solid fa-play'
+      : 'fa-solid fa-pause';
+  };
+
+  if (heroVideo && videoToggle) {
+    const applyMotionPreference = () => {
+      if (reducedMotion.matches) {
+        heroVideo.pause();
+        updateVideoButtonState();
+        return;
+      }
+
+      heroVideo.play().catch(updateVideoButtonState);
+    };
+
+    heroVideo.addEventListener('play', updateVideoButtonState);
+    heroVideo.addEventListener('pause', updateVideoButtonState);
+    heroVideo.addEventListener('loadeddata', updateVideoButtonState);
+    heroVideo.addEventListener('error', () => {
+      hero?.classList.add('hero-video-unavailable');
+      videoToggle.hidden = true;
+    });
+
+    videoToggle.addEventListener('click', () => {
+      if (heroVideo.paused) {
+        heroVideo.play().catch(updateVideoButtonState);
+      } else {
+        heroVideo.pause();
+      }
+    });
+
+    reducedMotion.addEventListener('change', applyMotionPreference);
+    applyMotionPreference();
+    updateVideoButtonState();
+  }
+
+  const showStatus = (form, message, type = 'success') => {
+    let status = form.querySelector('.form-status');
+    if (!status) {
+      status = document.createElement('div');
+      status.className = 'form-status mt-3';
+      status.setAttribute('role', 'status');
+      status.setAttribute('aria-live', 'polite');
+      form.appendChild(status);
+    }
+    status.className = `form-status alert alert-${type} mt-3`;
+    status.textContent = message;
+    status.focus();
+  };
+
+  const openWhatsApp = (message) => {
+    const url = `https://wa.me/${BUSINESS_PHONE}?text=${encodeURIComponent(message)}`;
+    const opened = window.open(url, '_blank', 'noopener,noreferrer');
+    if (!opened) {
+      window.location.href = url;
+    }
+  };
+
+  const setupTrackedForm = (form, formName) => {
+    if (!form) {
+      return;
+    }
+
+    let started = false;
+    form.addEventListener('focusin', () => {
+      if (!started) {
+        started = true;
+        trackEvent('form_start', { form_name: formName });
+      }
     });
   };
-  
-  // Initialize dropdown styling
-  handleDropdownStyling();
+
+  const quoteForm = document.getElementById('quoteForm');
+  const quoteService = document.getElementById('quoteService');
+  const quoteDate = document.getElementById('quoteDate');
+
+  if (quoteForm && quoteService) {
+    setupTrackedForm(quoteForm, 'quote');
+
+    const requestedService = query.get('service');
+    if (requestedService) {
+      const matchingOption = Array.from(quoteService.options).find(
+        (option) => option.value.toLowerCase() === requestedService.toLowerCase()
+      );
+      if (matchingOption) {
+        quoteService.value = matchingOption.value;
+      }
+    }
+
+    if (quoteDate) {
+      quoteDate.min = new Date().toISOString().split('T')[0];
+    }
+
+    quoteService.addEventListener('change', () => {
+      trackEvent('service_selected', {
+        form_name: 'quote',
+        service: quoteService.value
+      });
+    });
+
+    quoteForm.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const details = {
+        name: document.getElementById('quoteName').value.trim(),
+        contact: document.getElementById('quoteContact').value.trim(),
+        service: quoteService.value,
+        postcode: document.getElementById('quotePostcode').value.trim(),
+        date: quoteDate ? quoteDate.value : '',
+        notes: document.getElementById('quoteNotes').value.trim()
+      };
+
+      const message = [
+        '*RelyPro – Quote Request*',
+        '',
+        `Name: ${details.name}`,
+        `Phone or email: ${details.contact}`,
+        `Service: ${details.service}`,
+        `Postcode: ${details.postcode}`,
+        `Preferred date: ${details.date || 'Flexible'}`,
+        `Details: ${details.notes}`,
+        '',
+        `Source: ${campaign.utm_source || 'Direct'}`
+      ].join('\n');
+
+      trackEvent('quote_handoff', {
+        form_name: 'quote',
+        service: details.service,
+        postcode_area: details.postcode.replace(/\s*\d[A-Z]{2}$/i, '').slice(0, 8),
+        contact_method: 'whatsapp'
+      });
+      openWhatsApp(message);
+      showStatus(
+        quoteForm,
+        'WhatsApp has opened with your quote request. Press Send in WhatsApp to complete your enquiry.',
+        'info'
+      );
+    });
+  }
 
   const contactForm = document.getElementById('contactForm');
-  const quoteForm = document.getElementById('quoteForm');
-  const careersForm = document.getElementById('careersForm');
-  const quoteTypeSelect = document.getElementById('quoteType');
-  const quoteServiceSelect = document.getElementById('quoteService');
-
-  /**
-   * Filter service options to match the selected cleaning type
-   */
-  if (quoteTypeSelect && quoteServiceSelect) {
-    const placeholderOption = quoteServiceSelect.querySelector('option[value=""]');
-    const placeholderDefaultText = placeholderOption ? placeholderOption.textContent : '';
-    const serviceOptions = Array.from(
-      quoteServiceSelect.querySelectorAll('option[data-group]')
-    );
-
-    const setPlaceholderSelected = () => {
-      if (placeholderOption) {
-        quoteServiceSelect.value = placeholderOption.value;
-      } else {
-        quoteServiceSelect.selectedIndex = 0;
-      }
-
-      quoteServiceSelect.dispatchEvent(new Event('change', { bubbles: true }));
-    };
-
-    const updateServiceOptions = (selectedType) => {
-      const normalizedType = selectedType ? selectedType.toLowerCase() : '';
-      let visibleCount = 0;
-
-      serviceOptions.forEach((option) => {
-        const groups = (option.dataset.group || '')
-          .split(',')
-          .map((group) => group.trim().toLowerCase())
-          .filter(Boolean);
-
-        const matches = normalizedType && groups.includes(normalizedType);
-        option.hidden = !matches;
-        option.disabled = !matches;
-
-        if (matches) {
-          visibleCount += 1;
-        }
-      });
-
-      if (placeholderOption) {
-        placeholderOption.textContent = normalizedType
-          ? placeholderDefaultText
-          : 'Select a cleaning type first';
-      }
-
-      quoteServiceSelect.disabled = visibleCount === 0;
-      setPlaceholderSelected();
-    };
-
-    // Initial state on page load
-    updateServiceOptions(quoteTypeSelect.value);
-
-    quoteTypeSelect.addEventListener('change', (event) => {
-      updateServiceOptions(event.target.value);
-    });
-
-    if (quoteForm) {
-      quoteForm.addEventListener('reset', () => {
-        // Allow the browser to complete its reset before re-applying filters
-        setTimeout(() => updateServiceOptions(''), 0);
-      });
-    }
-  }
-  
-  /**
-   * Send contact form data via API
-   */
   if (contactForm) {
-    contactForm.addEventListener('submit', async (event) => {
+    setupTrackedForm(contactForm, 'contact');
+    contactForm.addEventListener('submit', (event) => {
       event.preventDefault();
-      
-      // Show loading state
-      const submitBtn = contactForm.querySelector('button[type="submit"]');
-      const originalText = submitBtn.textContent;
-      submitBtn.textContent = 'Sending...';
-      submitBtn.disabled = true;
-      
-      try {
-        const formData = {
-          name: document.getElementById('contactName').value.trim(),
-          email: document.getElementById('contactEmail').value.trim(),
-          subject: document.getElementById('contactSubject').value.trim(),
-          message: document.getElementById('contactMessage').value.trim(),
-          phone: '+447796584056',
-          type: 'contact'
-        };
-        
-        const whatsappMessage = `*RelyPro - New Contact Form Submission*\n\n` +
-          `👤 *Name:* ${formData.name}\n` +
-          `📧 *Email:* ${formData.email}\n` +
-          `📋 *Subject:* ${formData.subject}\n` +
-          `💬 *Message:* ${formData.message}\n\n` +
-          `⏰ *Submitted:* ${new Date().toLocaleString()}`;
-        
-        // Send to WhatsApp using API service
-        const response = await sendToWhatsApp(whatsappMessage, formData.phone);
-        
-        if (response.success) {
-          showSuccessMessage('Thank you for your message! We\'ll get back to you within 24 hours.');
-          contactForm.reset();
-        } else {
-          throw new Error('Failed to send message');
-        }
-        
-      } catch (error) {
-        console.error('Error sending contact form:', error);
-        showErrorMessage('Sorry, there was an issue sending your message. Please try again or contact us directly at enquiries@relypro.co.uk or +44 7796 584056.');
-      } finally {
-        // Restore button state
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-      }
+      const message = [
+        '*RelyPro – Contact Request*',
+        '',
+        `Name: ${document.getElementById('contactName').value.trim()}`,
+        `Email: ${document.getElementById('contactEmail').value.trim()}`,
+        `Subject: ${document.getElementById('contactSubject').value.trim()}`,
+        `Message: ${document.getElementById('contactMessage').value.trim()}`
+      ].join('\n');
+
+      trackEvent('contact_handoff', { form_name: 'contact', contact_method: 'whatsapp' });
+      openWhatsApp(message);
+      showStatus(
+        contactForm,
+        `WhatsApp has opened with your message. Press Send to contact RelyPro, or email ${BUSINESS_EMAIL}.`,
+        'info'
+      );
     });
   }
 
-  /**
-   * Send quote form data via API
-   */
-  if (quoteForm) {
-    quoteForm.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      
-      // Show loading state
-      const submitBtn = quoteForm.querySelector('button[type="submit"]');
-      const originalText = submitBtn.textContent;
-      submitBtn.textContent = 'Sending...';
-      submitBtn.disabled = true;
-      
-      try {
-        const formData = {
-          name: document.getElementById('quoteName').value.trim(),
-          email: document.getElementById('quoteEmail').value.trim(),
-          phone: document.getElementById('quotePhone').value.trim(),
-          type: document.getElementById('quoteType').value,
-          service: document.getElementById('quoteService').value,
-          address: document.getElementById('quoteAddress').value.trim(),
-          date: document.getElementById('quoteDate').value,
-          time: document.getElementById('quoteTime').value,
-          notes: document.getElementById('quoteNotes').value.trim(),
-          businessPhone: '+447796584056',
-          formType: 'quote'
-        };
-        
-        const whatsappMessage = `*RelyPro - New Quote Request*\n\n` +
-          `👤 *Name:* ${formData.name}\n` +
-          `📧 *Email:* ${formData.email}\n` +
-          `📱 *Phone:* ${formData.phone}\n` +
-          `🏠 *Type:* ${formData.type}\n` +
-          `🧹 *Service:* ${formData.service}\n` +
-          `📍 *Address:* ${formData.address}\n` +
-          `📅 *Date:* ${formData.date}\n` +
-          `⏰ *Time:* ${formData.time}\n` +
-          `📝 *Notes:* ${formData.notes || 'None'}\n\n` +
-          `⏰ *Submitted:* ${new Date().toLocaleString()}`;
-        
-        // Send to WhatsApp using API service
-        const response = await sendToWhatsApp(whatsappMessage, formData.businessPhone);
-        
-        if (response.success) {
-          showSuccessMessage('Thank you for your quote request! We\'ll review your requirements and get back to you with a personalized quote within 24 hours.');
-          quoteForm.reset();
-        } else {
-          throw new Error('Failed to send quote request');
-        }
-        
-      } catch (error) {
-        console.error('Error sending quote form:', error);
-        showErrorMessage('Sorry, there was an issue sending your quote request. Please try again or contact us directly at enquiries@relypro.co.uk or +44 7796 584056.');
-      } finally {
-        // Restore button state
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-      }
-    });
-  }
-
-  /**
-   * Careers form -> send via WhatsApp
-   */
+  const careersForm = document.getElementById('careersForm');
   if (careersForm) {
-    careersForm.addEventListener('submit', async (event) => {
+    setupTrackedForm(careersForm, 'careers');
+    careersForm.addEventListener('submit', (event) => {
       event.preventDefault();
+      const message = [
+        '*RelyPro – Careers Enquiry*',
+        '',
+        `Name: ${document.getElementById('careerName').value.trim()}`,
+        `Email: ${document.getElementById('careerEmail').value.trim()}`,
+        `Phone: ${document.getElementById('careerPhone').value.trim()}`,
+        `Role: ${document.getElementById('careerRole').value}`,
+        `Availability: ${document.getElementById('careerAvailability').value.trim()}`,
+        `Message: ${document.getElementById('careerNotes').value.trim() || 'None'}`
+      ].join('\n');
 
-      const submitBtn = careersForm.querySelector('button[type="submit"]');
-      const originalText = submitBtn.textContent;
-      submitBtn.textContent = 'Sending...';
-      submitBtn.disabled = true;
-
-      try {
-        const formData = {
-          name: document.getElementById('careerName').value.trim(),
-          email: document.getElementById('careerEmail').value.trim(),
-          phone: document.getElementById('careerPhone').value.trim(),
-          role: document.getElementById('careerRole').value,
-          availability: document.getElementById('careerAvailability').value.trim(),
-          notes: document.getElementById('careerNotes').value.trim(),
-          businessPhone: '+447796584056',
-          formType: 'careers'
-        };
-
-        const whatsappMessage = `*RelyPro - New Careers Application*\n\n` +
-          `👤 *Name:* ${formData.name}\n` +
-          `📧 *Email:* ${formData.email}\n` +
-          `📱 *Phone:* ${formData.phone}\n` +
-          `🧰 *Role:* ${formData.role}\n` +
-          `🗓️ *Availability:* ${formData.availability}\n` +
-          `📝 *Notes:* ${formData.notes || 'None'}\n\n` +
-          `⏰ *Submitted:* ${new Date().toLocaleString()}`;
-
-        const response = await sendToWhatsApp(whatsappMessage, formData.businessPhone);
-
-        if (response.success) {
-          showSuccessMessage('Thanks for applying! We\'ll review your details and get back to you shortly.');
-          careersForm.reset();
-        } else {
-          throw new Error('Failed to send application');
-        }
-      } catch (error) {
-        console.error('Error sending careers form:', error);
-        showErrorMessage('Sorry, there was an issue sending your application. Please try again or email careers@relypro.co.uk.');
-      } finally {
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-      }
+      trackEvent('careers_handoff', { form_name: 'careers', contact_method: 'whatsapp' });
+      openWhatsApp(message);
+      showStatus(
+        careersForm,
+        'WhatsApp has opened with your application details. Press Send to complete your enquiry.',
+        'info'
+      );
     });
-  }
-  
-  /**
-   * Send message to WhatsApp using multiple methods
-   */
-  async function sendToWhatsApp(message, phone) {
-    try {
-      // Method 1: Try CallMeBot API first
-      const success = await tryCallMeBot(message, phone);
-      if (success) {
-        return { success: true };
-      }
-      
-      // Method 2: Fallback to WhatsApp Web (silent)
-      const whatsappSuccess = await tryWhatsAppWeb(message, phone);
-      return { success: whatsappSuccess };
-      
-    } catch (error) {
-      console.error('All WhatsApp methods failed:', error);
-      return { success: false, error: error.message };
-    }
-  }
-  
-  /**
-   * Try CallMeBot API
-   */
-  async function tryCallMeBot(message, phone) {
-    try {
-      const apiKey = '4226641'; 
-      const phoneNumber = phone.replace('+', '').replace(/\s/g, '');
-      const encodedMessage = encodeURIComponent(message);
-      
-      const callMeBotUrl = `https://api.callmebot.com/whatsapp.php?phone=${phoneNumber}&text=${encodedMessage}&apikey=${apiKey}`;
-      
-      // Use fetch with no-cors mode
-      const response = await fetch(callMeBotUrl, {
-        method: 'GET',
-        mode: 'no-cors'
-      });
-      
-      console.log('CallMeBot request sent');
-      return true; // Assume success since we can't read the response with no-cors
-      
-    } catch (error) {
-      console.log('CallMeBot failed:', error);
-      return false;
-    }
-  }
-  
-  /**
-   * Fallback: Use WhatsApp Web in hidden iframe
-   */
-  async function tryWhatsAppWeb(message, phone) {
-    try {
-      const phoneNumber = phone.replace('+', '');
-      const encodedMessage = encodeURIComponent(message);
-      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
-      
-      // Create hidden iframe to trigger WhatsApp Web
-      const iframe = document.createElement('iframe');
-      iframe.style.display = 'none';
-      iframe.src = whatsappUrl;
-      document.body.appendChild(iframe);
-      
-      // Remove iframe after 2 seconds
-      setTimeout(() => {
-        if (iframe.parentNode) {
-          iframe.parentNode.removeChild(iframe);
-        }
-      }, 2000);
-      
-      console.log('WhatsApp Web fallback triggered');
-      return true;
-      
-    } catch (error) {
-      console.log('WhatsApp Web fallback failed:', error);
-      return false;
-    }
-  }
-  
-  /**
-   * Show success message to user
-   */
-  function showSuccessMessage(message) {
-    // Create and show success modal/alert
-    const alertDiv = document.createElement('div');
-    alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
-    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
-    alertDiv.innerHTML = `
-      <i class="fa-solid fa-check-circle me-2"></i>
-      ${message}
-      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    document.body.appendChild(alertDiv);
-    
-    // Auto-remove after 5 seconds
-    setTimeout(() => {
-      if (alertDiv.parentNode) {
-        alertDiv.remove();
-      }
-    }, 5000);
-  }
-  
-  /**
-   * Show error message to user
-   */
-  function showErrorMessage(message) {
-    // Create and show error modal/alert
-    const alertDiv = document.createElement('div');
-    alertDiv.className = 'alert alert-danger alert-dismissible fade show position-fixed';
-    alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
-    alertDiv.innerHTML = `
-      <i class="fa-solid fa-exclamation-triangle me-2"></i>
-      ${message}
-      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    document.body.appendChild(alertDiv);
-    
-    // Auto-remove after 8 seconds (longer for error messages)
-    setTimeout(() => {
-      if (alertDiv.parentNode) {
-        alertDiv.remove();
-      }
-    }, 8000);
   }
 });
