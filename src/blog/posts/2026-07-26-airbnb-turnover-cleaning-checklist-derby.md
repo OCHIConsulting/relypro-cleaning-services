@@ -1,6 +1,8 @@
 ---
-title: "Airbnb Turnover Cleaning Checklist for Derby Hosts"
-description: "A practical room-by-room Airbnb turnover checklist covering cleaning, linen, restocking and guest-ready checks for Derby hosts and property managers."
+title: Airbnb Turnover Cleaning Checklist for Derby Hosts
+description: A practical room-by-room Airbnb turnover checklist covering
+  cleaning, linen, restocking and guest-ready checks for Derby hosts and
+  property managers.
 date: 2026-07-26
 updated: 2026-07-26
 slug: airbnb-turnover-cleaning-checklist-derby
