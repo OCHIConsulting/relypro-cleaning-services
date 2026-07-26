@@ -10,6 +10,7 @@ A responsive static sales and local-search website for RelyPro Cleaning Services
 - Local Bootstrap and Font Awesome assets; no third-party font or CSS dependency.
 - Optimized WebP imagery, a compact hero video, reduced-motion support, and mobile conversion controls.
 - Page-specific search metadata, structured data, `robots.txt`, and `sitemap.xml`.
+- Eleventy-powered blog with Markdown content, Pages CMS editing, RSS and automated SEO output.
 
 ## Local Preview
 You can open `index.html` directly in a browser, but using a tiny static server is better for consistent asset paths.
@@ -24,11 +25,20 @@ On Windows without Python, consider installing the "Live Server" VS Code extensi
 
 ## Deployment
 
-This is a static site—no build step is required.
+The website remains fully static. Eleventy now builds the blog, copies the existing
+pages unchanged, and generates the sitemap and RSS feed.
+
+```bash
+npm install
+npm start
+```
+
+Run `npm test` before publishing. See `BLOG-WORKFLOW.md` for the Pages CMS and
+AI-assisted publishing process.
 
 ### Option A: GitHub Pages (simple & free)
 1. Push this repo to GitHub on the `main` branch.
-2. In GitHub: Settings → Pages → Source: `main` / `/ (root)` → Save.
+2. In GitHub: Settings → Pages → Source: `GitHub Actions` → Save.
 3. Optional: Set a custom domain under Settings → Pages → Custom domain.
 4. DNS: Add a CNAME for `www` → `ochiconsulting.github.io` (or your username). Add apex A records (GitHub Pages IPs) or forward apex to `www`.
 5. Enable “Enforce HTTPS” after the certificate is issued.
@@ -53,7 +63,7 @@ GA4 measurement ID `G-M2JVHYSZ9D` is configured across the site. Analytics loads
 See `SEO-OPERATIONS.md` for Search Console submission, conversion events, Google Business Profile and citation checks, and the account-level information still required before launch.
 
 ## Maintenance
-- Shared UI (header/footer) currently lives in each HTML file. To reduce duplication, consider migrating to a light static site generator (e.g., Eleventy) with layouts/partials, compiling back to static HTML for deploy.
+- Blog UI uses Eleventy layouts and partials. Existing static pages can be migrated to those shared layouts gradually without changing their URLs.
 - Keep images optimized (target ≤ 200 KB where practical) and include explicit width and height attributes.
 
 ## Project Structure
@@ -73,6 +83,12 @@ relypro-cleaning-services/
 ├── robots.txt
 ├── sitemap.xml
 ├── _headers
+├── .pages.yml
+├── eleventy.config.js
+├── src/
+│   ├── _includes/
+│   ├── _data/
+│   └── blog/
 ├── assets/
 │   ├── css/
 │   │   ├── bootstrap.relypro.min.css

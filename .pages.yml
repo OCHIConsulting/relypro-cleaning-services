@@ -1,0 +1,136 @@
+media:
+  input: assets/images/blog
+  output: /assets/images/blog
+  rename: safe
+  extensions: [webp, avif, jpg, jpeg, png]
+  categories: [image]
+
+content:
+  - name: blog
+    label: Blog posts
+    type: collection
+    path: src/blog/posts
+    format: yaml-frontmatter
+    exclude: [posts.11tydata.js]
+    filename:
+      template: "{year}-{month}-{day}-{title}.md"
+      field: create
+    view:
+      fields: [title, category, date, draft, featured]
+      primary: title
+      sort: [date, title]
+      search: [title, description, category, body]
+      default:
+        sort: date
+        order: desc
+    fields:
+      - name: title
+        label: Article title
+        type: string
+        required: true
+        options:
+          minlength: 20
+          maxlength: 70
+        description: Aim for a specific, useful title of 50–65 characters.
+      - name: description
+        label: Search description
+        type: text
+        required: true
+        options:
+          minlength: 100
+          maxlength: 160
+        description: A concise summary used in search and social previews.
+      - name: date
+        label: Publication date
+        type: date
+        required: true
+        options:
+          format: yyyy-MM-dd
+      - name: updated
+        label: Last updated
+        type: date
+        default: ""
+        options:
+          format: yyyy-MM-dd
+      - name: slug
+        label: URL slug
+        type: string
+        required: true
+        pattern:
+          regex: "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          message: Use lowercase words separated by hyphens.
+        options:
+          minlength: 3
+          maxlength: 90
+      - name: category
+        label: Category
+        type: select
+        required: true
+        options:
+          values:
+            - Airbnb Hosting
+            - Home Cleaning
+            - End of Tenancy
+            - Deep Cleaning
+            - Office Cleaning
+            - Carpet Care
+            - Property Management
+      - name: image
+        label: Cover image
+        type: image
+        required: true
+        options:
+          extensions: [webp, avif, jpg, jpeg, png]
+          rename: safe
+      - name: imageAlt
+        label: Cover image alternative text
+        type: string
+        required: true
+        options:
+          minlength: 8
+          maxlength: 140
+        description: Describe the image for people who cannot see it.
+      - name: featured
+        label: Featured article
+        type: boolean
+        default: false
+      - name: draft
+        label: Keep as draft
+        type: boolean
+        default: true
+        description: Draft posts are excluded from the website, sitemap and RSS feed.
+      - name: readingTime
+        label: Estimated reading time
+        type: number
+        default: 5
+        options:
+          min: 1
+          max: 30
+      - name: serviceLabel
+        label: Quote panel heading
+        type: string
+        required: true
+        options:
+          maxlength: 80
+      - name: serviceUrl
+        label: Quote panel link
+        type: string
+        required: true
+        pattern:
+          regex: "^/[A-Za-z0-9?&=%._/-]+$"
+          message: Use a root-relative website path beginning with /.
+      - name: body
+        label: Article content
+        type: rich-text
+        required: true
+
+settings:
+  content:
+    merge: true
+  commit:
+    identity: user
+    templates:
+      create: "content(blog): create {filename}"
+      update: "content(blog): update {filename}"
+      delete: "content(blog): remove {filename}"
+      rename: "content(blog): rename {oldFilename} to {filename}"
