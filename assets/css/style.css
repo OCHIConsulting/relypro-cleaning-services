@@ -1446,6 +1446,10 @@ input[type="time"]:valid {
     font-size: clamp(2rem, 10vw, 3rem);
   }
 
+  .article-breadcrumb .breadcrumb-item:last-child {
+    display: none;
+  }
+
   .article-content {
     font-size: 1rem;
   }
