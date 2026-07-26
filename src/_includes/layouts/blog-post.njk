@@ -1,0 +1,118 @@
+{% extends "layouts/base.njk" %}
+
+{% block head %}
+  <meta property="article:published_time" content="{{ date | isoDate }}" />
+  {% if updated %}<meta property="article:modified_time" content="{{ updated | isoDate }}" />{% endif %}
+  <meta property="article:section" content="{{ category }}" />
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "BlogPosting",
+          "@id": {{ ((page.url | absoluteUrl) + "#article") | json | safe }},
+          "headline": {{ title | json | safe }},
+          "description": {{ description | json | safe }},
+          "datePublished": {{ date | isoDate | json | safe }},
+          "dateModified": {{ (updated or date) | isoDate | json | safe }},
+          "image": [{{ (image or site.defaultImage) | absoluteUrl | json | safe }}],
+          "author": {
+            "@type": "Organization",
+            "name": {{ site.businessName | json | safe }},
+            "url": {{ site.url | json | safe }}
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": {{ site.businessName | json | safe }},
+            "logo": {
+              "@type": "ImageObject",
+              "url": {{ "/assets/images/relyprologo-black-300.webp" | absoluteUrl | json | safe }}
+            }
+          },
+          "mainEntityOfPage": {{ page.url | absoluteUrl | json | safe }},
+          "inLanguage": "en-GB"
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": {{ site.url | json | safe }}
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Blog",
+              "item": {{ "/blog/" | absoluteUrl | json | safe }}
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": {{ title | json | safe }},
+              "item": {{ page.url | absoluteUrl | json | safe }}
+            }
+          ]
+        }
+      ]
+    }
+  </script>
+{% endblock %}
+
+{% block content %}
+  <section class="article-hero">
+    <div class="container">
+      <nav aria-label="Breadcrumb">
+        <ol class="breadcrumb article-breadcrumb">
+          <li class="breadcrumb-item"><a href="/">Home</a></li>
+          <li class="breadcrumb-item"><a href="/blog/">Blog</a></li>
+          <li class="breadcrumb-item active" aria-current="page">{{ title }}</li>
+        </ol>
+      </nav>
+      <div class="row justify-content-center">
+        <div class="col-lg-9 text-center">
+          <span class="blog-category">{{ category }}</span>
+          <h1 class="display-5 fw-bold mt-3">{{ title }}</h1>
+          <p class="lead">{{ description }}</p>
+          <p class="article-byline mb-0">
+            By {{ author }} ·
+            <time datetime="{{ date | shortIsoDate }}">{{ date | readableDate }}</time>
+            {% if readingTime %} · {{ readingTime }} min read{% endif %}
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <article class="article-shell py-5">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-9">
+          <img
+            class="article-cover"
+            src="{{ image or site.defaultImage }}"
+            alt="{{ imageAlt }}"
+            width="1600"
+            height="900"
+            decoding="async"
+          />
+          <div class="article-content">
+            {{ content | safe }}
+          </div>
+          <aside class="article-cta" aria-label="Request a cleaning quote">
+            <div>
+              <p class="eyebrow mb-2">Need a reliable cleaner in Derby?</p>
+              <h2 class="h3 fw-bold mb-2">{{ serviceLabel or "Tell us what your property needs" }}</h2>
+              <p class="mb-0">Share a few details and RelyPro will provide a clear, personalised quote.</p>
+            </div>
+            <a class="btn btn-light btn-lg" href="{{ serviceUrl or '/get-quote.html' }}">Get a Quote</a>
+          </aside>
+          <div class="article-return">
+            <a href="/blog/">← Back to all cleaning guides</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </article>
+{% endblock %}

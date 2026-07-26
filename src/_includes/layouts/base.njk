@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ seoTitle or (title + " | RelyPro") }}</title>
+    <meta name="description" content="{{ description }}" />
+    <link rel="canonical" href="{{ canonical or (page.url | absoluteUrl) }}" />
+    <meta property="og:type" content="{{ ogType or 'website' }}" />
+    <meta property="og:site_name" content="{{ site.name }}" />
+    <meta property="og:title" content="{{ socialTitle or title }}" />
+    <meta property="og:description" content="{{ description }}" />
+    <meta property="og:url" content="{{ canonical or (page.url | absoluteUrl) }}" />
+    <meta property="og:image" content="{{ (image or site.defaultImage) | absoluteUrl }}" />
+    <meta property="og:image:alt" content="{{ imageAlt or 'RelyPro Cleaning Services in Derby' }}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="relypro-ga4-id" content="{{ site.analyticsId }}" />
+    <link rel="alternate" type="application/rss+xml" title="RelyPro cleaning advice" href="/feed.xml" />
+    <link rel="icon" href="/assets/images/favicon.png" type="image/png" />
+    <link href="/assets/css/bootstrap.relypro.min.css" rel="stylesheet" />
+    <link href="/assets/vendor/fontawesome/css/relypro-icons.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/css/style.css?v=20260726-blog" />
+    {% block head %}{% endblock %}
+  </head>
+  <body class="{{ bodyClass or 'blog-page' }}">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    {% include "partials/header.njk" %}
+    <main id="main-content">
+      {% block content %}{{ content | safe }}{% endblock %}
+    </main>
+    {% include "partials/footer.njk" %}
+    <script src="/assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/main.js?v=20260726-blog"></script>
+  </body>
+</html>

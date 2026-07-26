@@ -1,0 +1,29 @@
+---
+permalink: /sitemap.xml
+eleventyExcludeFromCollections: true
+---
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+{% for item in site.staticPages %}
+  <url>
+    <loc>{{ (item.path | absoluteUrl) | xmlEscape }}</loc>
+    <lastmod>{{ item.lastmod }}</lastmod>
+    <changefreq>{{ item.changefreq }}</changefreq>
+    <priority>{{ item.priority }}</priority>
+  </url>
+{% endfor %}
+  <url>
+    <loc>{{ "/blog/" | absoluteUrl }}</loc>
+    <lastmod>{% if collections.publishedPosts.length %}{{ collections.publishedPosts[0].date | shortIsoDate }}{% else %}2026-07-26{% endif %}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+{% for post in collections.publishedPosts %}
+  <url>
+    <loc>{{ post.url | absoluteUrl }}</loc>
+    <lastmod>{{ (post.data.updated or post.date) | shortIsoDate }}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+{% endfor %}
+</urlset>
