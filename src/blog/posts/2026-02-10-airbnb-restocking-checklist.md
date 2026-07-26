@@ -4,8 +4,8 @@ description: Create a reliable Airbnb restocking system for toiletries, kitchen 
 date: 2026-02-10
 slug: airbnb-restocking-checklist
 category: Airbnb Hosting
-image: /assets/images/collage-1.webp
-imageAlt: A guest-ready apartment with neatly arranged kitchen supplies
+image: /assets/images/blog/airbnb-restocking-checklist.webp
+imageAlt: A cleaner checking neatly organised Airbnb toiletries and kitchen supplies
 featured: false
 draft: false
 readingTime: 8

@@ -4,8 +4,8 @@ description: Create a clear cleaning plan for apartment entrances, corridors, st
 date: 2026-06-23
 slug: cleaning-communal-areas-apartment-buildings
 category: Property Management
-image: /assets/images/collage-3.webp
-imageAlt: A clean apartment building corridor and shared entrance
+image: /assets/images/blog/cleaning-communal-areas-apartment-buildings.webp
+imageAlt: Cleaners vacuuming the entrance and wiping handrails in an apartment lobby
 featured: false
 draft: false
 readingTime: 8

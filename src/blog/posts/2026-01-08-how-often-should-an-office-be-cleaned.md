@@ -4,8 +4,8 @@ description: Build the right office cleaning schedule for your Derby workplace b
 date: 2026-01-08
 slug: how-often-should-an-office-be-cleaned
 category: Office Cleaning
-image: /assets/images/aboutus-4.webp
-imageAlt: A professional cleaner preparing an office workspace
+image: /assets/images/blog/how-often-should-an-office-be-cleaned.webp
+imageAlt: A cleaner wiping an office meeting table while a manager checks the schedule
 featured: false
 draft: false
 readingTime: 7

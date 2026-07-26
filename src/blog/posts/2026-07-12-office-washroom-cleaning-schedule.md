@@ -4,8 +4,8 @@ description: Plan office washroom cleaning and daytime checks around occupancy, 
 date: 2026-07-12
 slug: office-washroom-cleaning-schedule
 category: Office Cleaning
-image: /assets/images/aboutus-4.webp
-imageAlt: A bright workplace washroom after professional cleaning
+image: /assets/images/blog/office-washroom-cleaning-schedule.webp
+imageAlt: A cleaner refilling a dispenser during an office washroom service check
 featured: false
 draft: false
 readingTime: 7

@@ -4,8 +4,8 @@ description: Organise packing, appliance preparation, cleaning and final evidenc
 date: 2026-04-29
 slug: move-out-cleaning-timeline
 category: End of Tenancy
-image: /assets/images/collage-2.webp
-imageAlt: An empty rental home ready for final move-out cleaning
+image: /assets/images/blog/move-out-cleaning-timeline.webp
+imageAlt: A tenant packing boxes while a cleaner vacuums the cleared rental flat
 featured: false
 draft: false
 readingTime: 7

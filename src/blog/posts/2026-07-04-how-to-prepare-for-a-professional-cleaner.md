@@ -4,8 +4,8 @@ description: Help your cleaner spend more time on cleaning by preparing access, 
 date: 2026-07-04
 slug: how-to-prepare-for-a-professional-cleaner
 category: Home Cleaning
-image: /assets/images/aboutus-1.webp
-imageAlt: A tidy home prepared for a professional cleaning appointment
+image: /assets/images/blog/how-to-prepare-for-a-professional-cleaner.webp
+imageAlt: A homeowner clearing personal items while a pet rests safely in another room
 featured: false
 draft: false
 readingTime: 6

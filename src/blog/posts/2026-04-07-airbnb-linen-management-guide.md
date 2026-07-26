@@ -4,8 +4,8 @@ description: Build a dependable linen process for Airbnb turnovers, including st
 date: 2026-04-07
 slug: airbnb-linen-management-guide
 category: Airbnb Hosting
-image: /assets/images/collage-1.webp
-imageAlt: Fresh white bedding prepared for an Airbnb guest arrival
+image: /assets/images/blog/airbnb-linen-management-guide.webp
+imageAlt: A cleaner inspecting fresh bedding beside an organised linen cupboard
 featured: true
 draft: false
 readingTime: 8

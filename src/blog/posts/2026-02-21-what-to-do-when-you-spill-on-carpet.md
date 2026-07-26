@@ -4,8 +4,8 @@ description: Follow a safe first-response process for carpet spills, avoid commo
 date: 2026-02-21
 slug: what-to-do-when-you-spill-on-carpet
 category: Carpet Care
-image: /assets/images/aboutus-2.webp
-imageAlt: A clean carpet being carefully inspected in a bright room
+image: /assets/images/blog/what-to-do-when-you-spill-on-carpet.webp
+imageAlt: A homeowner blotting a fresh carpet spill while a cleaner advises
 featured: false
 draft: false
 readingTime: 7

@@ -4,8 +4,8 @@ description: Compare cleaning companies using scope, insurance, communication, p
 date: 2026-05-10
 slug: how-to-choose-a-cleaning-company-derby
 category: Home Cleaning
-image: /assets/images/aboutus-2.webp
-imageAlt: A professional cleaning team discussing a property checklist
+image: /assets/images/blog/how-to-choose-a-cleaning-company-derby.webp
+imageAlt: A homeowner discussing the cleaning scope with a professional team
 featured: true
 draft: false
 readingTime: 8

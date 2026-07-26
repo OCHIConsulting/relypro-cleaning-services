@@ -4,8 +4,8 @@ description: See what a professional deep clean may cover room by room, which se
 date: 2026-04-18
 slug: what-does-a-professional-deep-clean-include
 category: Deep Cleaning
-image: /assets/images/aboutus-1.webp
-imageAlt: A cleaner completing detailed work in a modern home
+image: /assets/images/blog/what-does-a-professional-deep-clean-include.webp
+imageAlt: A cleaner detailing shower glass and fittings during a bathroom deep clean
 featured: false
 draft: false
 readingTime: 8

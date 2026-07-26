@@ -7,8 +7,8 @@ date: 2026-04-01
 updated: 2026-04-03
 slug: airbnb-turnover-cleaning-checklist-derby
 category: Airbnb Hosting
-image: /assets/images/collage-1.webp
-imageAlt: A bright, professionally prepared apartment living space
+image: /assets/images/blog/airbnb-turnover-cleaning-checklist-derby.webp
+imageAlt: A three-person team cleaning and checking a Derby Airbnb apartment
 featured: true
 draft: false
 readingTime: 7
