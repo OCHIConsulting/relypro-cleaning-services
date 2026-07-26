@@ -25,6 +25,29 @@ test('existing static website remains in the generated output', () => {
   }
 });
 
+test('homepage LocalBusiness structured data has Google required properties', () => {
+  const html = readOutput('index.html');
+  const jsonLdBlocks = [...html.matchAll(
+    /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g
+  )].map((match) => JSON.parse(match[1]));
+  const graphNodes = jsonLdBlocks.flatMap((block) => block['@graph'] || [block]);
+  const business = graphNodes.find((node) => {
+    const types = Array.isArray(node['@type']) ? node['@type'] : [node['@type']];
+    return types.includes('LocalBusiness');
+  });
+
+  assert.ok(business, 'homepage must define a LocalBusiness');
+  assert.equal(business.name, 'RelyPro Cleaning Services');
+  assert.deepEqual(business.address, {
+    '@type': 'PostalAddress',
+    addressLocality: 'Derby',
+    addressRegion: 'Derbyshire',
+    addressCountry: 'GB'
+  });
+  assert.equal(business.url, 'https://relypro.co.uk/');
+  assert.equal(business.telephone, '+44 7796 584056');
+});
+
 test('blog index uses the RelyPro design and links to published posts', () => {
   const html = readOutput('blog/index.html');
 
