@@ -4,8 +4,8 @@ description: Build a realistic checkout-to-check-in plan for cleaning, linen, re
 date: 2026-05-21
 slug: plan-a-same-day-airbnb-turnover
 category: Airbnb Hosting
-image: /assets/images/collage-3.webp
-imageAlt: A clean apartment living area prepared between guest stays
+image: /assets/images/blog/plan-a-same-day-airbnb-turnover.webp
+imageAlt: A turnover team making the bed and checking supplies before guest arrival
 featured: true
 draft: false
 readingTime: 9

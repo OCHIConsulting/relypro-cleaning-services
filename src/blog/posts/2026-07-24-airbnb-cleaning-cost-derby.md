@@ -4,8 +4,8 @@ description: Understand Airbnb cleaning prices in Derby, what changes a turnover
 date: 2026-07-24
 slug: airbnb-cleaning-cost-derby
 category: Airbnb Hosting
-image: /assets/images/collage-1.webp
-imageAlt: A professionally prepared Derby apartment ready for Airbnb guests
+image: /assets/images/blog/airbnb-cleaning-cost-derby.webp
+imageAlt: A host and cleaning supervisor assessing rooms for an Airbnb turnover quote
 featured: true
 draft: false
 readingTime: 8

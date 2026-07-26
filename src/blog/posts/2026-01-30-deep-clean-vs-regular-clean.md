@@ -4,8 +4,8 @@ description: Understand the difference between regular and deep cleaning, what e
 date: 2026-01-30
 slug: deep-clean-vs-regular-clean
 category: Deep Cleaning
-image: /assets/images/aboutus-1.webp
-imageAlt: Cleaning products ready for a detailed home clean
+image: /assets/images/blog/deep-clean-vs-regular-clean.webp
+imageAlt: One cleaner detailing cooker controls while another completes routine vacuuming
 featured: false
 draft: false
 readingTime: 7

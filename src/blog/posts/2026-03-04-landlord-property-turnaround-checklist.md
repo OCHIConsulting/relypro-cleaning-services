@@ -4,8 +4,8 @@ description: Coordinate cleaning, maintenance, inventory and safety checks betwe
 date: 2026-03-04
 slug: landlord-property-turnaround-checklist
 category: Property Management
-image: /assets/images/collage-3.webp
-imageAlt: A bright rental property prepared for its next occupants
+image: /assets/images/blog/landlord-property-turnaround-checklist.webp
+imageAlt: A property turnaround team checking the condition of an empty rental flat
 featured: false
 draft: false
 readingTime: 8

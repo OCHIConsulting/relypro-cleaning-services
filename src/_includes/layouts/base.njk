@@ -6,6 +6,12 @@
     <title>{{ seoTitle or (title + " | RelyPro") }}</title>
     <meta name="description" content="{{ description }}" />
     <link rel="canonical" href="{{ canonical or (page.url | absoluteUrl) }}" />
+    {% if pagination and pagination.href.previous %}
+    <link rel="prev" href="{{ pagination.href.previous | absoluteUrl }}" />
+    {% endif %}
+    {% if pagination and pagination.href.next %}
+    <link rel="next" href="{{ pagination.href.next | absoluteUrl }}" />
+    {% endif %}
     <meta property="og:type" content="{{ ogType or 'website' }}" />
     <meta property="og:site_name" content="{{ site.name }}" />
     <meta property="og:title" content="{{ socialTitle or title }}" />
@@ -20,7 +26,7 @@
     <link rel="icon" href="/assets/images/favicon.png" type="image/png" />
     <link href="/assets/css/bootstrap.relypro.min.css" rel="stylesheet" />
     <link href="/assets/vendor/fontawesome/css/relypro-icons.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="/assets/css/style.css?v=20260726-content" />
+    <link rel="stylesheet" href="/assets/css/style.css?v=20260726-blog-pagination" />
     {% block head %}{% endblock %}
   </head>
   <body class="{{ bodyClass or 'blog-page' }}">

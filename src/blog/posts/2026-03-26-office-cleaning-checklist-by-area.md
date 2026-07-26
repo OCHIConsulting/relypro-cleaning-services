@@ -4,8 +4,8 @@ description: Use this practical office cleaning checklist for entrances, desks, 
 date: 2026-03-26
 slug: office-cleaning-checklist-by-area
 category: Office Cleaning
-image: /assets/images/aboutus-4.webp
-imageAlt: An organised workplace ready for its daily office clean
+image: /assets/images/blog/office-cleaning-checklist-by-area.webp
+imageAlt: An office cleaning team working through entrance and meeting-room tasks
 featured: false
 draft: false
 readingTime: 8

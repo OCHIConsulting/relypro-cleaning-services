@@ -4,8 +4,8 @@ description: Reduce avoidable Airbnb cleanliness complaints with property-specif
 date: 2026-06-12
 slug: prevent-airbnb-cleanliness-complaints
 category: Airbnb Hosting
-image: /assets/images/collage-1.webp
-imageAlt: A spotless guest bathroom prepared for an Airbnb arrival
+image: /assets/images/blog/prevent-airbnb-cleanliness-complaints.webp
+imageAlt: A cleaner photographing a guest bathroom during the final quality check
 featured: true
 draft: false
 readingTime: 8

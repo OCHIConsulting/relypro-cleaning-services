@@ -5,7 +5,14 @@ seoTitle: Cleaning Advice & Guides for Derby | RelyPro
 description: Practical cleaning, Airbnb turnover and property-care guidance for Derby hosts, landlords, households and businesses from RelyPro Cleaning Services.
 socialTitle: Practical Cleaning Advice from RelyPro
 nav: blog
-permalink: /blog/index.html
+pagination:
+  data: collections.publishedPosts
+  size: 5
+  alias: posts
+permalink: "blog/{% if pagination.pageNumber > 0 %}page/{{ pagination.pageNumber + 1 }}/{% endif %}index.html"
+eleventyComputed:
+  seoTitle: "{% if pagination.pageNumber == 0 %}Cleaning Advice & Guides for Derby | RelyPro{% else %}Cleaning Advice & Guides – Page {{ pagination.pageNumber + 1 }} | RelyPro{% endif %}"
+  description: "{% if pagination.pageNumber == 0 %}Practical cleaning, Airbnb turnover and property-care guidance for Derby hosts, landlords, households and businesses from RelyPro Cleaning Services.{% else %}Browse page {{ pagination.pageNumber + 1 }} of RelyPro's practical cleaning guides for Derby hosts, landlords, households and businesses.{% endif %}"
 ---
 <section class="blog-hero">
   <div class="container text-center">
@@ -31,14 +38,101 @@ permalink: /blog/index.html
       </div>
     </div>
 
-    {% if collections.publishedPosts.length %}
-      <div class="row g-4">
-        {% for post in collections.publishedPosts %}
-          <div class="col-md-6 col-xl-4">
-            {% include "partials/article-card.njk" %}
+    {% if posts.length %}
+      {% if pagination.pageNumber == 0 %}
+        {% set featuredPost = posts[0] %}
+        <article class="blog-featured mb-5">
+          <div class="row g-0 align-items-stretch">
+            <div class="col-lg-7">
+              <a class="blog-featured__image-link" href="{{ featuredPost.url }}" aria-label="Read {{ featuredPost.data.title }}">
+                <img
+                  class="blog-featured__image"
+                  src="{{ featuredPost.data.image or site.defaultImage }}"
+                  alt="{{ featuredPost.data.imageAlt }}"
+                  width="1600"
+                  height="900"
+                  decoding="async"
+                />
+              </a>
+            </div>
+            <div class="col-lg-5">
+              <div class="blog-featured__body">
+                <span class="blog-featured__label">Featured guide</span>
+                <div class="blog-card__meta">
+                  <span class="blog-category">{{ featuredPost.data.category }}</span>
+                  <time datetime="{{ featuredPost.date | shortIsoDate }}">{{ featuredPost.date | readableDate }}</time>
+                </div>
+                <h2 class="display-6 fw-bold">
+                  <a href="{{ featuredPost.url }}">{{ featuredPost.data.title }}</a>
+                </h2>
+                <p>{{ featuredPost.data.description }}</p>
+                <a class="blog-card__link" href="{{ featuredPost.url }}">
+                  Read featured guide <span aria-hidden="true">→</span>
+                </a>
+              </div>
+            </div>
           </div>
+        </article>
+
+        <h2 class="h3 fw-bold mb-4">More recent guides</h2>
+      {% else %}
+        <p class="blog-page-count mb-4">
+          Showing articles {{ (pagination.pageNumber * pagination.size) + 1 }}–{{ (pagination.pageNumber * pagination.size) + posts.length }}
+          of {{ collections.publishedPosts.length }}
+        </p>
+      {% endif %}
+
+      <div class="row g-4">
+        {% for post in posts %}
+          {% if pagination.pageNumber > 0 or loop.index0 > 0 %}
+            <div class="col-md-6 col-xl-3">
+              {% include "partials/article-card.njk" %}
+            </div>
+          {% endif %}
         {% endfor %}
       </div>
+
+      {% if pagination.pages.length > 1 %}
+        <nav class="blog-pagination" aria-label="Blog pagination">
+          <ul class="blog-pagination__list">
+            <li>
+              {% if pagination.href.previous %}
+                <a class="blog-pagination__link blog-pagination__link--direction" href="{{ pagination.href.previous }}" rel="prev">
+                  <span aria-hidden="true">←</span> Previous
+                </a>
+              {% else %}
+                <span class="blog-pagination__link blog-pagination__link--direction is-disabled" aria-disabled="true">
+                  <span aria-hidden="true">←</span> Previous
+                </span>
+              {% endif %}
+            </li>
+            {% for pageEntry in pagination.pages %}
+              <li>
+                {% if loop.index0 == pagination.pageNumber %}
+                  <a class="blog-pagination__link is-current" href="{{ pagination.hrefs[loop.index0] }}" aria-current="page" aria-label="Page {{ loop.index }}">
+                    {{ loop.index }}
+                  </a>
+                {% else %}
+                  <a class="blog-pagination__link" href="{{ pagination.hrefs[loop.index0] }}" aria-label="Go to page {{ loop.index }}">
+                    {{ loop.index }}
+                  </a>
+                {% endif %}
+              </li>
+            {% endfor %}
+            <li>
+              {% if pagination.href.next %}
+                <a class="blog-pagination__link blog-pagination__link--direction" href="{{ pagination.href.next }}" rel="next">
+                  Next <span aria-hidden="true">→</span>
+                </a>
+              {% else %}
+                <span class="blog-pagination__link blog-pagination__link--direction is-disabled" aria-disabled="true">
+                  Next <span aria-hidden="true">→</span>
+                </span>
+              {% endif %}
+            </li>
+          </ul>
+        </nav>
+      {% endif %}
     {% else %}
       <div class="content-card text-center">
         <h2 class="h4 fw-bold">Our first guides are being prepared</h2>

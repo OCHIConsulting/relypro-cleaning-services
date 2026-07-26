@@ -4,8 +4,8 @@ description: Follow a practical room-by-room end-of-tenancy cleaning checklist, 
 date: 2026-01-19
 slug: end-of-tenancy-cleaning-checklist-derby
 category: End of Tenancy
-image: /assets/images/collage-2.webp
-imageAlt: A clean and empty kitchen prepared for a tenancy handover
+image: /assets/images/blog/end-of-tenancy-cleaning-checklist-derby.webp
+imageAlt: Cleaners inspecting and wiping cupboards in an empty rental kitchen
 featured: true
 draft: false
 readingTime: 9

@@ -4,8 +4,8 @@ description: Create a practical Airbnb deep-cleaning schedule using turnover obs
 date: 2026-07-19
 slug: airbnb-deep-cleaning-schedule
 category: Airbnb Hosting
-image: /assets/images/collage-3.webp
-imageAlt: A professionally deep-cleaned holiday-let bedroom
+image: /assets/images/blog/airbnb-deep-cleaning-schedule.webp
+imageAlt: Cleaners vacuuming behind a sofa and dusting a high holiday-let window
 featured: true
 draft: false
 readingTime: 8

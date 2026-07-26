@@ -4,8 +4,8 @@ description: Use short daily resets, a weekly room plan and periodic deep-cleani
 date: 2026-03-15
 slug: realistic-cleaning-schedule-for-busy-families
 category: Home Cleaning
-image: /assets/images/aboutus-1.webp
-imageAlt: A comfortable family living room after routine cleaning
+image: /assets/images/blog/realistic-cleaning-schedule-for-busy-families.webp
+imageAlt: A parent and child completing a quick living-room tidy together
 featured: false
 draft: false
 readingTime: 7

@@ -4,8 +4,8 @@ description: Decide when rental carpets need vacuuming, spot treatment, extracti
 date: 2026-06-01
 slug: carpet-cleaning-between-tenancies
 category: Carpet Care
-image: /assets/images/aboutus-2.webp
-imageAlt: A freshly cleaned carpet in an empty rental property
+image: /assets/images/blog/carpet-cleaning-between-tenancies.webp
+imageAlt: A technician extraction-cleaning carpet in an empty rental living room
 featured: false
 draft: false
 readingTime: 7
