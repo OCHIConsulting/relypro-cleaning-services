@@ -7,7 +7,7 @@
   "scripts": {
     "build": "eleventy",
     "start": "eleventy --serve",
-    "test": "npm run build && node --test tests/*.test.mjs"
+    "test": "npm run build && node --test tests/blog-build.test.mjs tests/lead-core.test.mjs tests/lead-endpoint.test.mjs tests/phase-one-static.test.mjs"
   },
   "devDependencies": {
     "@11ty/eleventy": "3.1.2"
