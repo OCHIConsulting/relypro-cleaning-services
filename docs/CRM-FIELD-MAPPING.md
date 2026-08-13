@@ -14,14 +14,14 @@ The free portal permits 10 custom deal properties. All 10 slots are currently us
 - `client_submission_id` — unique single-line text
 - `service_requested` — single-line text
 - `preferred_contact_channel` — single-line text
-- `postcode_service_area` — single-line text
+- `postcode__service_area` — single-line text
 - `property_summary` — single-line text
 - `landing_page` — single-line text
 - `next_action` — single-line text
 - `utm_source` — single-line text
 - `utm_medium` — single-line text
 
-HubSpot generated the internal property names from the labels above; verify those internal names in HubSpot before wiring the production destination. Use built-in properties where possible for create date, owner, amount, close date, closed-lost reason, contact email/phone, and deal stage. `utm_campaign`, preferred/next-action dates, recurring status, and structured loss reason remain provider-neutral payload fields but cannot receive dedicated custom deal properties on the current free limit. Preserve them in the private deal note or upgrade only after explicit approval.
+The internal property names were verified in HubSpot before preview activation. Use built-in properties where possible for create date, owner, amount, close date, closed-lost reason, contact email/phone, and deal stage. `utm_campaign`, preferred/next-action dates, recurring status, and structured loss reason remain provider-neutral payload fields but cannot receive dedicated custom deal properties on the current free limit. Preserve them in the private deal note or upgrade only after explicit approval.
 
 The free pipeline supports one closed-won and one closed-lost stage. `Completed` is the closed-won stage and `Lost / not proceeding` is the closed-lost stage. Recurring wins should be represented using a note/task until another structured field is available.
 
@@ -44,7 +44,7 @@ The free pipeline supports one closed-won and one closed-lost stage. `Completed`
 
 ## Pipeline and ownership
 
-Stages: New enquiry -> Contact attempted -> Requirements confirmed -> Quote being prepared -> Quote sent -> Follow-up due -> Booked -> Completed -> Won - recurring or Lost / not proceeding.
+Stages: New enquiry -> Contact attempted -> Requirements confirmed -> Quote being prepared -> Quote sent -> Follow-up due -> Booked -> Completed or Lost / not proceeding.
 
 Every open lead needs one named owner, `next_action`, and `next_action_date`. At intake, assign by service/rota; if no routing rule matches, assign to the sales inbox owner. Record quote value only when prepared, booked/completed dates when confirmed, revenue from completed work, and a controlled loss reason (`price`, `timing`, `outside area`, `service unavailable`, `no response`, `competitor`, `duplicate`, `other`). Free-text notes supplement rather than replace these fields.
 
