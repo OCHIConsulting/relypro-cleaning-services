@@ -10,7 +10,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const BUSINESS_EMAIL = 'enquiries@relypro.co.uk';
   const CONSENT_KEY = 'relyproConsent';
   const CAMPAIGN_KEY = 'relyproCampaign';
+  const LEAD_DRAFT_KEY = 'relyproLeadDraft';
   const CONSENT_MAX_AGE_MS = 180 * 24 * 60 * 60 * 1000;
+  const SAFE_ANALYTICS_PARAMETERS = new Set([
+    'analytics_storage', 'error_class', 'form_name', 'service',
+    'utm_source', 'utm_medium', 'utm_campaign'
+  ]);
+  const leadEndpoint = document.querySelector('meta[name="relypro-lead-endpoint"]')?.content?.trim() || '/api/leads';
 
   const header = document.getElementById('header');
   const setHeaderState = () => {
@@ -134,6 +140,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const campaign = readStoredJson(sessionStorage, CAMPAIGN_KEY);
+  const analyticsCampaign = Object.fromEntries(
+    ['utm_source', 'utm_medium', 'utm_campaign']
+      .filter((key) => typeof campaign[key] === 'string')
+      .map((key) => [key, campaign[key].slice(0, 120)])
+  );
   const readConsent = () => {
     const storedConsent = readStoredJson(localStorage, CONSENT_KEY, null);
     const updatedAt = storedConsent && Date.parse(storedConsent.updated_at);
@@ -206,9 +217,14 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const trackEvent = (name, parameters = {}) => {
+    const safeParameters = Object.fromEntries(
+      Object.entries(parameters)
+        .filter(([key, value]) => SAFE_ANALYTICS_PARAMETERS.has(key) && ['string', 'number', 'boolean'].includes(typeof value))
+        .map(([key, value]) => [key, typeof value === 'string' ? value.slice(0, 120) : value])
+    );
     const detail = {
-      ...campaign,
-      ...parameters,
+      ...analyticsCampaign,
+      ...safeParameters,
       page_path: window.location.pathname
     };
 
@@ -315,10 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
             href.includes('get-quote') ? 'quote_click' : '');
 
     if (eventName) {
-      trackEvent(eventName, {
-        link_url: href,
-        link_text: (link.textContent || '').trim().slice(0, 100)
-      });
+      trackEvent(eventName);
     }
   });
 
@@ -382,6 +395,7 @@ document.addEventListener('DOMContentLoaded', () => {
       status.className = 'form-status mt-3';
       status.setAttribute('role', 'status');
       status.setAttribute('aria-live', 'polite');
+      status.setAttribute('tabindex', '-1');
       form.appendChild(status);
     }
     status.className = `form-status alert alert-${type} mt-3`;
@@ -397,16 +411,93 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  const createSubmissionId = () => window.crypto?.randomUUID?.() ||
+    `${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
+
+  const saveDraft = (form) => {
+    const values = {};
+    new FormData(form).forEach((value, key) => {
+      if (key !== 'website' && key !== 'privacy_acknowledged') values[key] = String(value).slice(0, 1500);
+    });
+    sessionStorage.setItem(LEAD_DRAFT_KEY, JSON.stringify({ form: form.id, values }));
+  };
+
+  const restoreDraft = (form) => {
+    const draft = readStoredJson(sessionStorage, LEAD_DRAFT_KEY, null);
+    if (!draft || draft.form !== form.id || !draft.values) return;
+    Object.entries(draft.values).forEach(([name, value]) => {
+      const field = form.elements.namedItem(name);
+      if (field && typeof value === 'string') field.value = value;
+    });
+  };
+
+  const renderFallbacks = (form, whatsappMessage) => {
+    let actions = form.querySelector('.lead-fallbacks');
+    if (!actions) {
+      actions = document.createElement('div');
+      actions.className = 'lead-fallbacks d-flex flex-wrap gap-2 mt-3';
+      form.appendChild(actions);
+    }
+    actions.innerHTML = '';
+    const links = [
+      ['Call RelyPro', `tel:+${BUSINESS_PHONE}`],
+      ['Email RelyPro', `mailto:${BUSINESS_EMAIL}`],
+      ['Continue in WhatsApp', `https://wa.me/${BUSINESS_PHONE}?text=${encodeURIComponent(whatsappMessage)}`]
+    ];
+    links.forEach(([label, href]) => {
+      const link = document.createElement('a');
+      link.className = 'btn btn-outline-primary-relypro';
+      link.href = href;
+      link.textContent = label;
+      if (href.includes('wa.me')) {
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.dataset.track = 'whatsapp_handoff';
+      }
+      actions.appendChild(link);
+    });
+  };
+
+  const submitLead = async (form, lead) => {
+    trackEvent('quote_submit_attempt', lead.kind === 'quote' ? { service: lead.service } : {});
+    const response = await fetch(leadEndpoint, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(lead)
+    });
+    let body = {};
+    try { body = await response.json(); } catch { /* The host may return an HTML error page. */ }
+    if (!response.ok || !body.ok || !body.reference) {
+      const error = new Error(body.error || 'lead_capture_unavailable');
+      error.fields = body.fields || {};
+      throw error;
+    }
+    return body;
+  };
+
+  const applyServerErrors = (form, fields) => {
+    const summary = form.querySelector('.form-error-summary');
+    if (!summary || !Object.keys(fields).length) return false;
+    summary.hidden = false;
+    summary.textContent = Object.values(fields).join(' ');
+    summary.focus();
+    return true;
+  };
+
   const setupTrackedForm = (form, formName) => {
     if (!form) {
       return;
     }
 
     let started = false;
+    form.dataset.startedAt = new Date().toISOString();
+    form.dataset.submissionId = createSubmissionId();
+    restoreDraft(form);
+    form.addEventListener('input', () => saveDraft(form));
     form.addEventListener('focusin', () => {
       if (!started) {
         started = true;
-        trackEvent('form_start', { form_name: formName });
+        trackEvent(formName === 'quote' ? 'quote_start' : 'form_start', { form_name: formName });
       }
     });
   };
@@ -439,8 +530,12 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    quoteForm.addEventListener('submit', (event) => {
+    quoteForm.addEventListener('submit', async (event) => {
       event.preventDefault();
+      const errorSummary = quoteForm.querySelector('.form-error-summary');
+      if (errorSummary) errorSummary.hidden = true;
+      const submitButton = quoteForm.querySelector('button[type="submit"]');
+      if (submitButton) submitButton.disabled = true;
       const details = {
         name: document.getElementById('quoteName').value.trim(),
         contact: document.getElementById('quoteContact').value.trim(),
@@ -449,8 +544,23 @@ document.addEventListener('DOMContentLoaded', () => {
         date: quoteDate ? quoteDate.value : '',
         notes: document.getElementById('quoteNotes').value.trim()
       };
-
-      const message = [
+      const lead = {
+        kind: 'quote',
+        name: details.name,
+        contact_method: document.getElementById('quoteContactMethod').value,
+        contact_details: details.contact,
+        service: details.service,
+        postcode: details.postcode,
+        property_summary: details.notes,
+        preferred_date: details.date,
+        privacy_acknowledged: document.getElementById('quotePrivacy').checked,
+        website: quoteForm.elements.website.value,
+        started_at: quoteForm.dataset.startedAt,
+        client_submission_id: quoteForm.dataset.submissionId,
+        landing_page: window.location.pathname,
+        attribution: campaign
+      };
+      const fallbackMessage = [
         '*RelyPro – Quote Request*',
         '',
         `Name: ${details.name}`,
@@ -460,30 +570,54 @@ document.addEventListener('DOMContentLoaded', () => {
         `Preferred date: ${details.date || 'Flexible'}`,
         `Details: ${details.notes}`,
         '',
-        `Source: ${campaign.utm_source || 'Direct'}`
+        'The website could not save this enquiry. Please confirm receipt.'
       ].join('\n');
-
-      trackEvent('quote_handoff', {
-        form_name: 'quote',
-        service: details.service,
-        postcode_area: details.postcode.replace(/\s*\d[A-Z]{2}$/i, '').slice(0, 8),
-        contact_method: 'whatsapp'
-      });
-      openWhatsApp(message);
-      showStatus(
-        quoteForm,
-        'WhatsApp has opened with your quote request. Press Send in WhatsApp to complete your enquiry.',
-        'info'
-      );
+      try {
+        const result = await submitLead(quoteForm, lead);
+        sessionStorage.removeItem(LEAD_DRAFT_KEY);
+        trackEvent('lead_capture_success', { service: details.service });
+        showStatus(quoteForm, `Thank you. Your enquiry reference is ${result.reference}. Choose WhatsApp below if you would also like to start a chat.`, 'success');
+        renderFallbacks(quoteForm, `*RelyPro enquiry ${result.reference}*\nService: ${details.service}\nPreferred date: ${details.date || 'Flexible'}`);
+      } catch (error) {
+        trackEvent('lead_capture_failure', { error_class: error.message === 'validation_failed' ? 'validation' : 'unavailable' });
+        if (!applyServerErrors(quoteForm, error.fields || {})) {
+          showStatus(quoteForm, `We could not safely save the enquiry. Your entries remain on this page. Please try again or use one of the contact options below.`, 'warning');
+        }
+        renderFallbacks(quoteForm, fallbackMessage);
+      } finally {
+        if (submitButton) submitButton.disabled = false;
+      }
     });
   }
 
   const contactForm = document.getElementById('contactForm');
   if (contactForm) {
     setupTrackedForm(contactForm, 'contact');
-    contactForm.addEventListener('submit', (event) => {
+    contactForm.addEventListener('submit', async (event) => {
       event.preventDefault();
-      const message = [
+      const errorSummary = contactForm.querySelector('.form-error-summary');
+      if (errorSummary) errorSummary.hidden = true;
+      const submitButton = contactForm.querySelector('button[type="submit"]');
+      if (submitButton) submitButton.disabled = true;
+      const subject = document.getElementById('contactSubject').value.trim();
+      const customerMessage = document.getElementById('contactMessage').value.trim();
+      const lead = {
+        kind: 'contact',
+        name: document.getElementById('contactName').value.trim(),
+        contact_method: 'email',
+        contact_details: document.getElementById('contactEmail').value.trim(),
+        service: 'Other',
+        postcode: '',
+        property_summary: `${subject}: ${customerMessage}`,
+        preferred_date: '',
+        privacy_acknowledged: document.getElementById('contactPrivacy').checked,
+        website: contactForm.elements.website.value,
+        started_at: contactForm.dataset.startedAt,
+        client_submission_id: contactForm.dataset.submissionId,
+        landing_page: window.location.pathname,
+        attribution: campaign
+      };
+      const fallbackMessage = [
         '*RelyPro – Contact Request*',
         '',
         `Name: ${document.getElementById('contactName').value.trim()}`,
@@ -492,13 +626,21 @@ document.addEventListener('DOMContentLoaded', () => {
         `Message: ${document.getElementById('contactMessage').value.trim()}`
       ].join('\n');
 
-      trackEvent('contact_handoff', { form_name: 'contact', contact_method: 'whatsapp' });
-      openWhatsApp(message);
-      showStatus(
-        contactForm,
-        `WhatsApp has opened with your message. Press Send to contact RelyPro, or email ${BUSINESS_EMAIL}.`,
-        'info'
-      );
+      try {
+        const result = await submitLead(contactForm, lead);
+        sessionStorage.removeItem(LEAD_DRAFT_KEY);
+        trackEvent('lead_capture_success');
+        showStatus(contactForm, `Thank you. Your enquiry reference is ${result.reference}.`, 'success');
+        renderFallbacks(contactForm, `*RelyPro enquiry ${result.reference}*\nSubject: ${subject}`);
+      } catch (error) {
+        trackEvent('lead_capture_failure', { error_class: error.message === 'validation_failed' ? 'validation' : 'unavailable' });
+        if (!applyServerErrors(contactForm, error.fields || {})) {
+          showStatus(contactForm, 'We could not safely save the enquiry. Your entries remain on this page. Please try again or use a contact option below.', 'warning');
+        }
+        renderFallbacks(contactForm, `${fallbackMessage}\n\nThe website could not save this enquiry. Please confirm receipt.`);
+      } finally {
+        if (submitButton) submitButton.disabled = false;
+      }
     });
   }
 

@@ -3,3 +3,8 @@ _site/
 .cache/
 .DS_Store
 npm-debug.log*
+.dev.vars
+.env
+.env.*
+!.dev.vars.example
+!.env.example

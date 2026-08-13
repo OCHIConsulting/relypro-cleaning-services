@@ -1,0 +1,5 @@
+# Cloudflare Pages Functions local/production secret names. Never commit real values.
+LEAD_DESTINATION_URL=https://example.invalid/relypro-leads
+LEAD_DESTINATION_TOKEN=replace-in-secret-store
+RATE_LIMIT_SALT=replace-with-a-long-random-secret
+# Bind a KV namespace as LEAD_DEDUPLICATION for 24-hour retry deduplication and hashed rate-limit counters.

@@ -1686,3 +1686,7 @@ input[type="time"]:valid {
     transition-duration: 0.01ms !important;
   }
 }
+/* Spam trap: intentionally unavailable to visitors and assistive technology. */
+.lead-honeypot {
+  display: none !important;
+}

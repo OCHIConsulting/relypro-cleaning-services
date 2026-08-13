@@ -15,6 +15,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta name="relypro-ga4-id" content="G-M2JVHYSZ9D" />
+    <meta name="relypro-lead-endpoint" content="/api/leads" />
     <link rel="icon" href="assets/images/favicon.png" type="image/png" />
     <link
       href="assets/css/bootstrap.relypro.min.css"
@@ -24,7 +25,7 @@
       href="assets/vendor/fontawesome/css/relypro-icons.min.css"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="assets/css/style.css?v=20260813-leads" />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -117,6 +118,7 @@
             <h2 class="fw-bold mb-4 text-center">Tell us about your needs</h2>
             <p class="text-muted text-center mb-4">We only need enough information to give you a useful first response. We will ask for the full address after confirming the service and price.</p>
             <form id="quoteForm">
+              <div class="alert alert-danger form-error-summary" role="alert" tabindex="-1" hidden></div>
               <div class="row g-3">
                 <div class="col-md-6">
                   <label for="quoteName" class="form-label">Full Name</label>
@@ -131,15 +133,22 @@
                   />
                 </div>
                 <div class="col-md-6">
-                  <label for="quoteContact" class="form-label">Phone or email</label>
+                  <label for="quoteContactMethod" class="form-label">How should we reply?</label>
+                  <select id="quoteContactMethod" name="contact_method" class="form-select" required>
+                    <option value="email">Email</option>
+                    <option value="phone">Phone call</option>
+                    <option value="whatsapp">WhatsApp</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label for="quoteContact" class="form-label">Contact details</label>
                   <input
                     type="text"
                     class="form-control"
                     id="quoteContact"
                     name="contact"
                     autocomplete="email"
-                    inputmode="email"
-                    placeholder="How should we reply?"
+                    placeholder="Email address or phone number"
                     required
                   />
                 </div>
@@ -186,12 +195,22 @@
                   <label for="quoteDate" class="form-label">Preferred date <span class="text-muted">(optional)</span></label>
                   <input type="date" class="form-control" id="quoteDate" name="preferred_date" />
                 </div>
+                <div class="lead-honeypot" aria-hidden="true">
+                  <label for="quoteWebsite">Leave this field empty</label>
+                  <input type="text" id="quoteWebsite" name="website" tabindex="-1" autocomplete="off" />
+                </div>
+                <div class="col-12">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="quotePrivacy" name="privacy_acknowledged" required />
+                    <label class="form-check-label" for="quotePrivacy">I have read the <a href="privacy.html">privacy notice</a> and understand that RelyPro will use these details to respond to my enquiry.</label>
+                  </div>
+                </div>
               </div>
               <button type="submit" class="btn btn-primary mt-4 w-100">
-                Continue in WhatsApp
+                Send quote request
               </button>
               <p class="form-privacy">
-                Your details are used only to respond to this enquiry. Submitting opens WhatsApp with your information ready for you to review and send. See our <a href="privacy.html">privacy notice</a>.
+                Your enquiry is saved before any optional WhatsApp handoff. We do not add quote requesters to marketing lists.
               </p>
             </form>
           </div>
@@ -228,6 +247,6 @@
       </div>
     </footer>
 
-    <script src="assets/js/main.js?v=20260725-analytics"></script>
+    <script src="assets/js/main.js?v=20260813-leads"></script>
   </body>
 </html>

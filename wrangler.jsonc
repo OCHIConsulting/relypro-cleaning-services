@@ -1,0 +1,6 @@
+{
+  "$schema": "https://raw.githubusercontent.com/cloudflare/workers-sdk/main/packages/wrangler/config-schema.json",
+  "name": "relypro-cleaning-services",
+  "pages_build_output_dir": "./_site",
+  "compatibility_date": "2026-08-13"
+}
