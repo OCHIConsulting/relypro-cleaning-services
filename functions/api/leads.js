@@ -1,4 +1,5 @@
 import { makeDeduplicationKey, makeReference, toStoredLead, validateLead } from '../../lib/lead-core.js';
+import { saveHubSpotLead } from '../../lib/hubspot-lead.js';
 
 const json = (body, status = 200, headers = {}) => new Response(JSON.stringify(body), {
   status,
@@ -18,6 +19,7 @@ async function rateLimited(env, ip, now) {
 }
 
 async function saveLead(env, lead) {
+  if (env.LEAD_DESTINATION_PROVIDER === 'hubspot') return saveHubSpotLead(env, lead);
   if (!env.LEAD_DESTINATION_URL) throw new Error('destination_unconfigured');
   const response = await fetch(env.LEAD_DESTINATION_URL, {
     method: 'POST',
