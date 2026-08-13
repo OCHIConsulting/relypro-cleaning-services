@@ -26,6 +26,7 @@ test('maps a stored lead to HubSpot without dropping operational details', () =>
   assert.equal(deal.pipeline, 'default');
   assert.equal(deal.dealstage, 'appointmentscheduled');
   assert.equal(deal.enquiry_reference, 'RP-260813-ABC123');
+  assert.equal(deal.postcode__service_area, 'DE1 2AB');
   assert.match(deal.description, /Marketing consent: No/);
   assert.match(deal.description, /UTM campaign: synthetic/);
 });
