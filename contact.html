@@ -149,6 +149,17 @@
                   />
                 </div>
                 <div class="col-md-6">
+                  <label for="contactCompany" class="form-label">Company or property name <span class="text-muted">(optional)</span></label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="contactCompany"
+                    name="company_name"
+                    autocomplete="organization"
+                    placeholder="Business, agency or property name"
+                  />
+                </div>
+                <div class="col-md-6">
                   <label for="contactEmail" class="form-label">Email</label>
                   <input
                     type="email"
@@ -158,6 +169,18 @@
                     autocomplete="email"
                     placeholder="your@email.com"
                     required
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="contactPhone" class="form-label">Phone number <span class="text-muted">(optional)</span></label>
+                  <input
+                    type="tel"
+                    class="form-control"
+                    id="contactPhone"
+                    name="phone_number"
+                    autocomplete="tel"
+                    inputmode="tel"
+                    placeholder="e.g. +44 7796 123456"
                   />
                 </div>
                 <div class="col-12">
@@ -246,6 +269,6 @@
       </div>
     </footer>
 
-    <script src="assets/js/main.js?v=20260814-complete-leads"></script>
+    <script src="assets/js/main.js?v=20260814-company-phone"></script>
   </body>
 </html>

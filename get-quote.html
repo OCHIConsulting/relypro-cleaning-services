@@ -132,6 +132,17 @@
                   />
                 </div>
                 <div class="col-md-6">
+                  <label for="quoteCompany" class="form-label">Company or property name <span class="text-muted">(optional)</span></label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="quoteCompany"
+                    name="company_name"
+                    autocomplete="organization"
+                    placeholder="Business, agency or property name"
+                  />
+                </div>
+                <div class="col-md-6">
                   <label for="quoteContactMethod" class="form-label">How should we reply?</label>
                   <select id="quoteContactMethod" name="contact_method" class="form-select" required>
                     <option value="email">Email</option>
@@ -140,15 +151,27 @@
                   </select>
                 </div>
                 <div class="col-md-6">
-                  <label for="quoteContact" class="form-label">Contact details</label>
+                  <label for="quoteContact" id="quoteContactLabel" class="form-label">Email address</label>
                   <input
-                    type="text"
+                    type="email"
                     class="form-control"
                     id="quoteContact"
                     name="contact"
                     autocomplete="email"
-                    placeholder="Email address or phone number"
+                    placeholder="your@email.com"
                     required
+                  />
+                </div>
+                <div class="col-md-6" id="quoteOptionalPhoneGroup">
+                  <label for="quotePhone" class="form-label">Phone number <span class="text-muted">(optional)</span></label>
+                  <input
+                    type="tel"
+                    class="form-control"
+                    id="quotePhone"
+                    name="phone_number"
+                    autocomplete="tel"
+                    inputmode="tel"
+                    placeholder="e.g. +44 7796 123456"
                   />
                 </div>
                 <div class="col-md-6">
@@ -246,6 +269,6 @@
       </div>
     </footer>
 
-    <script src="assets/js/main.js?v=20260814-complete-leads"></script>
+    <script src="assets/js/main.js?v=20260814-company-phone"></script>
   </body>
 </html>

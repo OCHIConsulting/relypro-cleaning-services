@@ -10,8 +10,18 @@ test('quote and contact forms expose privacy acknowledgement and error summaries
     assert.match(html, /form-error-summary[^>]*role="alert"/);
     assert.match(html, /name="privacy_acknowledged" required/);
     assert.match(html, /name="website"[^>]*tabindex="-1"/);
+    assert.match(html, /name="company_name"/);
+    assert.match(html, /name="phone_number"/);
     assert.doesNotMatch(html, /name="relypro-lead-endpoint"/);
   }
+});
+
+test('quote contact input follows the selected reply method', async () => {
+  const source = await read('assets/js/main.js');
+  assert.match(source, /quoteContact\.type = usesEmail \? 'email' : 'tel'/);
+  assert.match(source, /quoteContactLabel\.textContent = usesEmail \? 'Email address'/);
+  assert.match(source, /quoteOptionalPhoneGroup\.hidden = !usesEmail/);
+  assert.match(source, /quotePhone\.disabled = !usesEmail/);
 });
 
 test('forms use the first-party endpoint without a cross-origin bridge', async () => {
@@ -42,7 +52,8 @@ test('email and WhatsApp handoffs include every visible quote and contact field'
   assert.match(source, /mailto:\$\{BUSINESS_EMAIL\}\?subject=\$\{encodeURIComponent\(emailSubject\)\}&body=\$\{encodeURIComponent\(message\)\}/);
   for (const label of [
     'Name:', 'Preferred reply:', 'Contact details:', 'Service:', 'Postcode:',
-    'What would you like cleaned?:', 'Preferred date:', 'Email:', 'Subject:', 'Message:',
+    'Company or property name:', 'Phone number:', 'What would you like cleaned?:',
+    'Preferred date:', 'Email:', 'Subject:', 'Message:',
     'Privacy notice acknowledged: Yes'
   ]) {
     assert.match(source, new RegExp(label.replace(/[?]/g, '\\?')));
@@ -50,7 +61,7 @@ test('email and WhatsApp handoffs include every visible quote and contact field'
 });
 
 test('every source page uses the current JavaScript cache-busting release', async () => {
-  const release = 'assets/js/main.js?v=20260814-complete-leads';
+  const release = 'assets/js/main.js?v=20260814-company-phone';
   const pages = [
     'about.html', 'airbnb-turnover-cleaning-derby.html', 'areas.html', 'careers.html',
     'carpet-cleaning-derby.html', 'contact.html', 'cookies.html', 'deep-cleaning-derby.html',
@@ -60,7 +71,7 @@ test('every source page uses the current JavaScript cache-busting release', asyn
   for (const page of pages) {
     assert.match(await read(page), new RegExp(release.replace(/[.?]/g, '\\$&')));
   }
-  assert.match(await read('src/_includes/layouts/base.njk'), /\/assets\/js\/main\.js\?v=20260814-complete-leads/);
+  assert.match(await read('src/_includes/layouts/base.njk'), /\/assets\/js\/main\.js\?v=20260814-company-phone/);
 });
 
 test('privacy notice identifies the website and CRM processors', async () => {

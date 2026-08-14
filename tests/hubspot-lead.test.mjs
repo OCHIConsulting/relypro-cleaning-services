@@ -9,8 +9,10 @@ test('maps a stored lead to HubSpot without dropping operational details', () =>
     created_at: '2026-08-13T12:00:00.000Z',
     kind: 'quote',
     name: 'Synthetic Customer',
+    company_name: 'Synthetic Property Ltd',
     contact_method: 'email',
     contact_details: 'customer@example.invalid',
+    phone_number: '+447700900123',
     service: 'Regular Cleaning',
     postcode: 'DE1 2AB',
     property_summary: 'Synthetic test property, never a real customer.',
@@ -21,7 +23,9 @@ test('maps a stored lead to HubSpot without dropping operational details', () =>
   assert.deepEqual(contact, {
     firstname: 'Synthetic',
     lastname: 'Customer',
-    email: 'customer@example.invalid'
+    company: 'Synthetic Property Ltd',
+    email: 'customer@example.invalid',
+    phone: '+447700900123'
   });
   assert.equal(deal.pipeline, 'default');
   assert.equal(deal.dealstage, 'appointmentscheduled');
@@ -35,8 +39,10 @@ test('maps a stored lead to HubSpot without dropping operational details', () =>
   assert.equal(deal.utm_source, 'test');
   assert.equal(deal.utm_medium, 'automation');
   assert.match(deal.description, /Name: Synthetic Customer/);
+  assert.match(deal.description, /Company or property name: Synthetic Property Ltd/);
   assert.match(deal.description, /Preferred reply: email/);
   assert.match(deal.description, /Contact details: customer@example\.invalid/);
+  assert.match(deal.description, /Phone number: \+447700900123/);
   assert.match(deal.description, /Service: Regular Cleaning/);
   assert.match(deal.description, /Postcode: DE1 2AB/);
   assert.match(deal.description, /What would you like cleaned\?: Synthetic test property, never a real customer\./);
@@ -48,15 +54,17 @@ test('maps a stored lead to HubSpot without dropping operational details', () =>
   assert.match(deal.description, /UTM campaign: synthetic/);
 });
 
-test('keeps contact-form subject and message as separately labelled HubSpot details', () => {
-  const { deal } = toHubSpotRecords({
+test('keeps contact-form company, phone, subject and message as labelled HubSpot details', () => {
+  const { contact, deal } = toHubSpotRecords({
     enquiry_reference: 'RP-260813-CONTACT',
     client_submission_id: 'submission-contact-1234',
     created_at: '2026-08-13T12:00:00.000Z',
     kind: 'contact',
     name: 'Synthetic Enquirer',
+    company_name: 'Synthetic Office',
     contact_method: 'email',
     contact_details: 'enquirer@example.invalid',
+    phone_number: '+447700900456',
     service: 'Other',
     postcode: '',
     property_summary: 'Availability: Please confirm Saturday availability.',
@@ -67,6 +75,10 @@ test('keeps contact-form subject and message as separately labelled HubSpot deta
     landing_page: '/contact.html',
     attribution: {}
   });
+  assert.equal(contact.company, 'Synthetic Office');
+  assert.equal(contact.phone, '+447700900456');
+  assert.match(deal.description, /Company or property name: Synthetic Office/);
+  assert.match(deal.description, /Phone number: \+447700900456/);
   assert.match(deal.description, /Subject: Availability/);
   assert.match(deal.description, /Message: Please confirm Saturday availability\./);
 });

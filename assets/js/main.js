@@ -471,8 +471,10 @@ document.addEventListener('DOMContentLoaded', () => {
       reference ? `Enquiry reference: ${reference}` : '',
       '',
       `Name: ${details.name}`,
+      `Company or property name: ${details.companyName || 'Not supplied'}`,
       `Preferred reply: ${contactMethodLabel(details.contactMethod)}`,
       `Contact details: ${details.contact}`,
+      `Phone number: ${details.phoneNumber || 'Not supplied'}`,
       `Service: ${details.service}`,
       `Postcode: ${details.postcode}`,
       `What would you like cleaned?: ${details.notes}`,
@@ -490,7 +492,9 @@ document.addEventListener('DOMContentLoaded', () => {
       reference ? `Enquiry reference: ${reference}` : '',
       '',
       `Name: ${details.name}`,
+      `Company or property name: ${details.companyName || 'Not supplied'}`,
       `Email: ${details.email}`,
+      `Phone number: ${details.phoneNumber || 'Not supplied'}`,
       `Subject: ${details.subject}`,
       `Message: ${details.message}`,
       'Privacy notice acknowledged: Yes',
@@ -546,6 +550,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const quoteForm = document.getElementById('quoteForm');
   const quoteService = document.getElementById('quoteService');
   const quoteDate = document.getElementById('quoteDate');
+  const quoteContactMethod = document.getElementById('quoteContactMethod');
+  const quoteContact = document.getElementById('quoteContact');
+  const quoteContactLabel = document.getElementById('quoteContactLabel');
+  const quoteOptionalPhoneGroup = document.getElementById('quoteOptionalPhoneGroup');
+  const quotePhone = document.getElementById('quotePhone');
 
   if (quoteForm && quoteService) {
     setupTrackedForm(quoteForm, 'quote');
@@ -564,6 +573,20 @@ document.addEventListener('DOMContentLoaded', () => {
       quoteDate.min = new Date().toISOString().split('T')[0];
     }
 
+    const updateQuoteContactFields = () => {
+      const method = quoteContactMethod.value;
+      const usesEmail = method === 'email';
+      quoteContactLabel.textContent = usesEmail ? 'Email address' : method === 'whatsapp' ? 'WhatsApp number' : 'Phone number';
+      quoteContact.type = usesEmail ? 'email' : 'tel';
+      quoteContact.autocomplete = usesEmail ? 'email' : 'tel';
+      quoteContact.inputMode = usesEmail ? 'email' : 'tel';
+      quoteContact.placeholder = usesEmail ? 'your@email.com' : 'e.g. +44 7796 123456';
+      quoteOptionalPhoneGroup.hidden = !usesEmail;
+      quotePhone.disabled = !usesEmail;
+    };
+    quoteContactMethod.addEventListener('change', updateQuoteContactFields);
+    updateQuoteContactFields();
+
     quoteService.addEventListener('change', () => {
       trackEvent('service_selected', {
         form_name: 'quote',
@@ -579,8 +602,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (submitButton) submitButton.disabled = true;
       const details = {
         name: document.getElementById('quoteName').value.trim(),
-        contactMethod: document.getElementById('quoteContactMethod').value,
-        contact: document.getElementById('quoteContact').value.trim(),
+        companyName: document.getElementById('quoteCompany').value.trim(),
+        contactMethod: quoteContactMethod.value,
+        contact: quoteContact.value.trim(),
+        phoneNumber: quoteContactMethod.value === 'email' ? quotePhone.value.trim() : quoteContact.value.trim(),
         service: quoteService.value,
         postcode: document.getElementById('quotePostcode').value.trim(),
         date: quoteDate ? quoteDate.value : '',
@@ -589,8 +614,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const lead = {
         kind: 'quote',
         name: details.name,
+        company_name: details.companyName,
         contact_method: details.contactMethod,
         contact_details: details.contact,
+        phone_number: details.phoneNumber,
         service: details.service,
         postcode: details.postcode,
         property_summary: details.notes,
@@ -633,15 +660,19 @@ document.addEventListener('DOMContentLoaded', () => {
       const customerMessage = document.getElementById('contactMessage').value.trim();
       const details = {
         name: document.getElementById('contactName').value.trim(),
+        companyName: document.getElementById('contactCompany').value.trim(),
         email: document.getElementById('contactEmail').value.trim(),
+        phoneNumber: document.getElementById('contactPhone').value.trim(),
         subject,
         message: customerMessage
       };
       const lead = {
         kind: 'contact',
         name: details.name,
+        company_name: details.companyName,
         contact_method: 'email',
         contact_details: details.email,
+        phone_number: details.phoneNumber,
         service: 'Other',
         postcode: '',
         property_summary: `${subject}: ${customerMessage}`,

@@ -31,8 +31,10 @@ The free pipeline supports one closed-won and one closed-lost stage. `Completed`
 | `client_submission_id` | custom contact/deal property | Unique integration key; never shown publicly |
 | `created_at` | create date / custom received time | UTC ISO 8601 |
 | `name` | first/last name | Split conservatively; retain full name if ambiguous |
+| `company_name` | built-in contact company and private deal description | Optional company or property context; do not send to analytics |
 | `contact_method` | custom preferred contact channel | Email, phone, or WhatsApp |
 | `contact_details` | email or phone | Route by method; do not invent missing values |
+| `phone_number` | built-in contact phone and private deal description | Optional when email is preferred; mirrors `contact_details` for phone/WhatsApp enquiries |
 | `service` | custom service property | Canonical values from `SERVICES` |
 | `postcode` | postal code | Quote leads only; retain spacing |
 | `property_summary` | custom `property_summary` and private deal description | Quote label is “What would you like cleaned?”; duplicate into the description so it is visible even when the custom property is not on the record sidebar; exclude from analytics |
@@ -44,7 +46,8 @@ The free pipeline supports one closed-won and one closed-lost stage. `Completed`
 | `marketing_consent` | marketing permission | Always false for this flow |
 
 Every deal description also carries the reference, received time, enquiry type,
-name, preferred reply method, contact details, service, postcode, cleaning details
+name, optional company/property name, preferred reply method, contact details,
+optional phone number, service, postcode, cleaning details
 or contact subject/message, preferred date, landing page, source/medium/campaign,
 privacy acknowledgement and the fixed no-marketing-consent state. This readable
 copy is deliberate: HubSpot Free's ten custom-property limit must not cause a
