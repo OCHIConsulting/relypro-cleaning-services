@@ -4,7 +4,7 @@
 
 Locally complete: provider-neutral lead schema and endpoint; client/server validation; spam timing and honeypot checks; distributed hashed-IP rate limiting; retry deduplication; public references; session draft recovery; explicit failure/fallback states; optional customer-controlled WhatsApp handoff; analytics parameter allow-list; privacy acknowledgement; CRM mapping; human-approved messages; commercial and Airbnb checklists; tests and responsive/accessibility review.
 
-Preview integration active: the Git-integrated Cloudflare Pages project builds this branch, the `LEAD_DEDUPLICATION` KV binding is configured, and an encrypted HubSpot service key is available to preview Functions. HubSpot Free contains the RelyPro pipeline and the ten mapped deal properties. Email and phone-path synthetic submissions created associated contacts/deals in the preview environment. Production code, DNS, pricing, customer data and outbound messages remain unchanged.
+Preview integration active: the Git-integrated Cloudflare Pages project builds this branch, the `LEAD_DEDUPLICATION` KV binding is configured, and an encrypted HubSpot service key is available to preview Functions. HubSpot Free contains the RelyPro pipeline and the ten mapped deal properties. Email and phone-path synthetic submissions created associated contacts/deals in the preview environment. Separate preview and production KV namespaces and encrypted rate-limit salts are configured. Production code, DNS, pricing, customer data and outbound messages remain unchanged.
 
 Verification: `npm test` builds 28 pages and passes 25 tests. Chrome checks at 1440 x 900 and 390 x 844 found no horizontal overflow; both quote/contact forms have one H1, no duplicate IDs, no visible unlabeled controls, and alert semantics for server errors. With no consent, and after choosing essential-only, no Google Tag Manager script loaded. A synthetic unavailable-endpoint submission retained the visible entries, stayed on the form URL, showed no false success, and exposed three fallback routes. Cloudflare preview deployment `a9cdeaa4` succeeded for commit `92d7178`. Synthetic email and phone submissions returned `RP-260813-7AC9DC` and `RP-260813-45BD1C`; the first deal was visually verified in `RelyPro Sales Pipeline` at `New enquiry`.
 
@@ -45,11 +45,11 @@ Permitted parameters are page path, form name, canonical service, non-personal U
 
 1. Completed: verify `admin@relypro.co.uk` and create a Git-integrated Cloudflare Pages project with build command `npm run build`, output `_site`, and production branch `main`.
 2. Completed for preview: configure HubSpot Free, the RelyPro pipeline, field mapping and a least-privilege service key with contact read/write and deal write scopes.
-3. Completed for the HubSpot token; still required before production activation: store a randomly generated `RATE_LIMIT_SALT` as an encrypted secret. Never add values to Git.
-4. Completed for preview: create and bind `relypro-lead-deduplication` as `LEAD_DEDUPLICATION`. Before production activation, decide whether to use a separate production namespace.
+3. Completed: store the HubSpot token and independently generated preview/production `RATE_LIMIT_SALT` values as encrypted secrets. Values never enter Git.
+4. Completed: bind preview to `relypro-lead-deduplication` and production to the isolated `relypro-lead-deduplication-production` namespace as `LEAD_DEDUPLICATION`.
 5. If the API is on another origin, update the page meta tag, CSP `connect-src`, endpoint CORS allow-list, and preflight handling together.
-6. Add the approved processor and purpose to the privacy notice before activation.
-7. Configure alerting on sustained 5xx responses and a dead-letter/retry process that never logs request bodies; optionally add a Cloudflare rate-limit rule as defence in depth.
+6. Prepared on the branch: disclose Cloudflare website/enquiry processing and HubSpot CRM processing in the privacy notice. Publish only with the approved production release.
+7. Prepared: endpoint failures emit only `lead_capture_failed` and a non-personal failure category; request bodies, contact details, IP addresses and references are never logged. Still required: finish the Cloudflare dashboard alert for deployment failures and decide on a sustained-runtime-5xx alert/retry process before activation.
 8. Synthetic acceptance tests and destination inspection are complete. Retain the clearly labelled synthetic records unless deletion is separately approved; obtain explicit production deployment approval before merging.
 
 ## Rollback

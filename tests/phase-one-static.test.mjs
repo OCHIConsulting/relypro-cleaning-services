@@ -28,3 +28,9 @@ test('client only reports lead success after an accepted API response', async ()
   const successEvent = source.indexOf("trackEvent('lead_capture_success'");
   assert.ok(responseCheck > -1 && successEvent > responseCheck);
 });
+
+test('privacy notice identifies the website and CRM processors', async () => {
+  const html = await read('privacy.html');
+  assert.match(html, /Cloudflare to host and protect the website and to process enquiry submissions/);
+  assert.match(html, /HubSpot as our customer relationship management provider/);
+});

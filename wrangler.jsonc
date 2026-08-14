@@ -11,5 +11,18 @@
       "binding": "LEAD_DEDUPLICATION",
       "id": "e87d64618da7482cb5eb5d6fd0195ac8"
     }
-  ]
+  ],
+  "env": {
+    "production": {
+      "vars": {
+        "LEAD_DESTINATION_PROVIDER": "hubspot"
+      },
+      "kv_namespaces": [
+        {
+          "binding": "LEAD_DEDUPLICATION",
+          "id": "aa7382e1fe3b4b30a0b2367bea61c5a3"
+        }
+      ]
+    }
+  }
 }

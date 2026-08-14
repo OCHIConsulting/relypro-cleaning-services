@@ -56,6 +56,7 @@ export async function onRequestPost({ request, env }) {
     return json({ ok: true, reference });
   } catch (error) {
     const errorClass = error?.message === 'destination_unconfigured' ? 'unavailable' : 'upstream_failure';
+    console.error(JSON.stringify({ event: 'lead_capture_failed', error: errorClass }));
     return json({ error: errorClass }, 503, { 'retry-after': '60' });
   }
 }

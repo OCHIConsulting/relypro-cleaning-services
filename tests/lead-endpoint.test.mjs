@@ -31,10 +31,16 @@ test('returns validation errors without calling a destination', async () => {
   assert.equal((await response.json()).error, 'validation_failed');
 });
 
-test('does not return false success when storage is unconfigured', async () => {
+test('does not return false success or log personal data when storage is unconfigured', async (context) => {
+  const originalConsoleError = console.error;
+  const logs = [];
+  console.error = (message) => logs.push(message);
+  context.after(() => { console.error = originalConsoleError; });
   const response = await onRequestPost({ request: request(payload(), '192.0.2.11'), env: {} });
   assert.equal(response.status, 503);
   assert.deepEqual(await response.json(), { error: 'unavailable' });
+  assert.deepEqual(logs, [JSON.stringify({ event: 'lead_capture_failed', error: 'unavailable' })]);
+  assert.doesNotMatch(logs.join('\n'), /Synthetic Customer|customer@example\.invalid|DE1 2AB|192\.0\.2\.11|property_summary/);
 });
 
 test('persists once and returns the prior reference on an idempotent retry', async (context) => {
@@ -60,7 +66,10 @@ test('persists once and returns the prior reference on an idempotent retry', asy
   assert.equal(calls, 1);
 });
 
-test('rate limits excessive repeated submissions', async () => {
+test('rate limits excessive repeated submissions', async (context) => {
+  const originalConsoleError = console.error;
+  console.error = () => {};
+  context.after(() => { console.error = originalConsoleError; });
   const ip = '192.0.2.13';
   const records = new Map();
   const env = {
