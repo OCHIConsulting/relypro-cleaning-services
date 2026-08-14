@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { onRequestPost } from '../functions/api/leads.js';
+import { onRequestOptions, onRequestPost } from '../functions/api/leads.js';
 
 const payload = () => ({
   kind: 'quote',
@@ -19,15 +19,26 @@ const payload = () => ({
   attribution: { utm_source: 'test' }
 });
 
-const request = (body, ip) => new Request('https://example.invalid/api/leads', {
+const request = (body, ip, origin) => new Request('https://example.invalid/api/leads', {
   method: 'POST',
-  headers: { 'content-type': 'application/json', 'cf-connecting-ip': ip },
+  headers: { 'content-type': 'application/json', 'cf-connecting-ip': ip, ...(origin ? { origin } : {}) },
   body: JSON.stringify(body)
 });
 
+test('allows preflight only for RelyPro and Cloudflare Pages origins', async () => {
+  for (const origin of ['https://relypro.co.uk', 'https://www.relypro.co.uk', 'https://preview.relypro-cleaning-services.pages.dev']) {
+    const response = onRequestOptions({ request: new Request('https://example.invalid/api/leads', { method: 'OPTIONS', headers: { origin } }) });
+    assert.equal(response.status, 204);
+    assert.equal(response.headers.get('access-control-allow-origin'), origin);
+  }
+  const denied = onRequestOptions({ request: new Request('https://example.invalid/api/leads', { method: 'OPTIONS', headers: { origin: 'https://attacker.example' } }) });
+  assert.equal(denied.status, 403);
+});
+
 test('returns validation errors without calling a destination', async () => {
-  const response = await onRequestPost({ request: request({ ...payload(), name: '' }, '192.0.2.10'), env: {} });
+  const response = await onRequestPost({ request: request({ ...payload(), name: '' }, '192.0.2.10', 'https://relypro.co.uk'), env: {} });
   assert.equal(response.status, 422);
+  assert.equal(response.headers.get('access-control-allow-origin'), 'https://relypro.co.uk');
   assert.equal((await response.json()).error, 'validation_failed');
 });
 

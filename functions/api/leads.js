@@ -6,6 +6,26 @@ const json = (body, status = 200, headers = {}) => new Response(JSON.stringify(b
   headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', ...headers }
 });
 
+const isAllowedOrigin = (origin) => {
+  if (!origin) return false;
+  try {
+    const { protocol, hostname } = new URL(origin);
+    return protocol === 'https:' && (
+      hostname === 'relypro.co.uk' ||
+      hostname === 'www.relypro.co.uk' ||
+      hostname === 'relypro-cleaning-services.pages.dev' ||
+      hostname.endsWith('.relypro-cleaning-services.pages.dev')
+    );
+  } catch {
+    return false;
+  }
+};
+
+const corsHeaders = (request) => {
+  const origin = request.headers.get('origin');
+  return isAllowedOrigin(origin) ? { 'access-control-allow-origin': origin, vary: 'Origin' } : {};
+};
+
 async function rateLimited(env, ip, now) {
   if (!env.LEAD_DEDUPLICATION) return false;
   const bucket = Math.floor(now / 600000);
@@ -34,31 +54,46 @@ async function saveLead(env, lead) {
 }
 
 export async function onRequestPost({ request, env }) {
+  const reply = (body, status = 200, headers = {}) => json(body, status, { ...corsHeaders(request), ...headers });
   if (!request.headers.get('content-type')?.toLowerCase().includes('application/json')) {
-    return json({ error: 'invalid_content_type' }, 415);
+    return reply({ error: 'invalid_content_type' }, 415);
   }
   const ip = request.headers.get('cf-connecting-ip') || 'unknown';
-  if (await rateLimited(env, ip, Date.now())) return json({ error: 'rate_limited' }, 429, { 'retry-after': '600' });
+  if (await rateLimited(env, ip, Date.now())) return reply({ error: 'rate_limited' }, 429, { 'retry-after': '600' });
 
   let input;
-  try { input = await request.json(); } catch { return json({ error: 'invalid_json' }, 400); }
+  try { input = await request.json(); } catch { return reply({ error: 'invalid_json' }, 400); }
   const validation = validateLead(input);
-  if (!validation.ok) return json({ error: 'validation_failed', fields: validation.errors }, 422);
+  if (!validation.ok) return reply({ error: 'validation_failed', fields: validation.errors }, 422);
 
   const key = await makeDeduplicationKey(validation.lead);
   const existing = env.LEAD_DEDUPLICATION && await env.LEAD_DEDUPLICATION.get(key);
-  if (existing) return json({ ok: true, reference: existing, duplicate: true });
+  if (existing) return reply({ ok: true, reference: existing, duplicate: true });
 
   const reference = makeReference();
   try {
     await saveLead(env, toStoredLead(validation.lead, reference));
     if (env.LEAD_DEDUPLICATION) await env.LEAD_DEDUPLICATION.put(key, reference, { expirationTtl: 86400 });
-    return json({ ok: true, reference });
+    return reply({ ok: true, reference });
   } catch (error) {
     const errorClass = error?.message === 'destination_unconfigured' ? 'unavailable' : 'upstream_failure';
     console.error(JSON.stringify({ event: 'lead_capture_failed', error: errorClass }));
-    return json({ error: errorClass }, 503, { 'retry-after': '60' });
+    return reply({ error: errorClass }, 503, { 'retry-after': '60' });
   }
+}
+
+export function onRequestOptions({ request }) {
+  const headers = corsHeaders(request);
+  if (!headers['access-control-allow-origin']) return json({ error: 'origin_not_allowed' }, 403);
+  return new Response(null, {
+    status: 204,
+    headers: {
+      ...headers,
+      'access-control-allow-methods': 'POST, OPTIONS',
+      'access-control-allow-headers': 'content-type',
+      'access-control-max-age': '86400'
+    }
+  });
 }
 
 export function onRequest() {

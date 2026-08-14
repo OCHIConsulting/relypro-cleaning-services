@@ -47,7 +47,7 @@ Permitted parameters are page path, form name, canonical service, non-personal U
 2. Completed for preview: configure HubSpot Free, the RelyPro pipeline, field mapping and a least-privilege service key with contact read/write and deal write scopes.
 3. Completed: store the HubSpot token and independently generated preview/production `RATE_LIMIT_SALT` values as encrypted secrets. Values never enter Git.
 4. Completed: bind preview to `relypro-lead-deduplication` and production to the isolated `relypro-lead-deduplication-production` namespace as `LEAD_DEDUPLICATION`.
-5. If the API is on another origin, update the page meta tag, CSP `connect-src`, endpoint CORS allow-list, and preflight handling together.
+5. Completed for the pre-DNS bridge: the GitHub-hosted public forms call the Cloudflare production endpoint; page metadata, CSP `connect-src`, the narrow RelyPro/Pages CORS allow-list and preflight handling are kept together. Revert the absolute endpoint to `/api/leads` after the live domain moves to Cloudflare.
 6. Prepared on the branch: disclose Cloudflare website/enquiry processing and HubSpot CRM processing in the privacy notice. Publish only with the approved production release.
 7. Prepared: endpoint failures emit only `lead_capture_failed` and a non-personal failure category; request bodies, contact details, IP addresses and references are never logged. Still required: finish the Cloudflare dashboard alert for deployment failures and decide on a sustained-runtime-5xx alert/retry process before activation.
 8. Synthetic acceptance tests and destination inspection are complete. Retain the clearly labelled synthetic records unless deletion is separately approved; obtain explicit production deployment approval before merging.
