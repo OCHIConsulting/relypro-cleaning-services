@@ -10,13 +10,15 @@ test('quote and contact forms expose privacy acknowledgement and error summaries
     assert.match(html, /form-error-summary[^>]*role="alert"/);
     assert.match(html, /name="privacy_acknowledged" required/);
     assert.match(html, /name="website"[^>]*tabindex="-1"/);
-    assert.match(html, /name="relypro-lead-endpoint" content="https:\/\/relypro-cleaning-services\.pages\.dev\/api\/leads"/);
+    assert.doesNotMatch(html, /name="relypro-lead-endpoint"/);
   }
 });
 
-test('security policy allows the temporary Cloudflare lead endpoint bridge', async () => {
+test('forms use the first-party endpoint without a cross-origin bridge', async () => {
+  const source = await read('assets/js/main.js');
   const headers = await read('_headers');
-  assert.match(headers, /connect-src[^\n]+https:\/\/relypro-cleaning-services\.pages\.dev/);
+  assert.match(source, /\|\| '\/api\/leads'/);
+  assert.doesNotMatch(headers, /connect-src[^\n]+https:\/\/relypro-cleaning-services\.pages\.dev/);
 });
 
 test('analytics code does not send form contents, contact details, postcodes, or link URLs', async () => {
