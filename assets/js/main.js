@@ -431,7 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  const renderFallbacks = (form, whatsappMessage) => {
+  const renderFallbacks = (form, { emailSubject, message }) => {
     let actions = form.querySelector('.lead-fallbacks');
     if (!actions) {
       actions = document.createElement('div');
@@ -441,8 +441,8 @@ document.addEventListener('DOMContentLoaded', () => {
     actions.innerHTML = '';
     const links = [
       ['Call RelyPro', `tel:+${BUSINESS_PHONE}`],
-      ['Email RelyPro', `mailto:${BUSINESS_EMAIL}`],
-      ['Continue in WhatsApp', `https://wa.me/${BUSINESS_PHONE}?text=${encodeURIComponent(whatsappMessage)}`]
+      ['Email RelyPro', `mailto:${BUSINESS_EMAIL}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(message)}`],
+      ['Continue in WhatsApp', `https://wa.me/${BUSINESS_PHONE}?text=${encodeURIComponent(message)}`]
     ];
     links.forEach(([label, href]) => {
       const link = document.createElement('a');
@@ -457,6 +457,47 @@ document.addEventListener('DOMContentLoaded', () => {
       actions.appendChild(link);
     });
   };
+
+  const contactMethodLabel = (method) => ({
+    email: 'Email',
+    phone: 'Phone call',
+    whatsapp: 'WhatsApp'
+  })[method] || method;
+
+  const quoteHandoff = (details, reference = '', saveFailed = false) => ({
+    emailSubject: reference ? `RelyPro quote request ${reference}` : 'RelyPro quote request',
+    message: [
+      '*RelyPro – Quote Request*',
+      reference ? `Enquiry reference: ${reference}` : '',
+      '',
+      `Name: ${details.name}`,
+      `Preferred reply: ${contactMethodLabel(details.contactMethod)}`,
+      `Contact details: ${details.contact}`,
+      `Service: ${details.service}`,
+      `Postcode: ${details.postcode}`,
+      `What would you like cleaned?: ${details.notes}`,
+      `Preferred date: ${details.date || 'Flexible'}`,
+      'Privacy notice acknowledged: Yes',
+      saveFailed ? '' : null,
+      saveFailed ? 'The website could not save this enquiry. Please confirm receipt.' : null
+    ].filter((line) => line !== null).join('\n')
+  });
+
+  const contactHandoff = (details, reference = '', saveFailed = false) => ({
+    emailSubject: reference ? `RelyPro contact request ${reference}: ${details.subject}` : `RelyPro contact request: ${details.subject}`,
+    message: [
+      '*RelyPro – Contact Request*',
+      reference ? `Enquiry reference: ${reference}` : '',
+      '',
+      `Name: ${details.name}`,
+      `Email: ${details.email}`,
+      `Subject: ${details.subject}`,
+      `Message: ${details.message}`,
+      'Privacy notice acknowledged: Yes',
+      saveFailed ? '' : null,
+      saveFailed ? 'The website could not save this enquiry. Please confirm receipt.' : null
+    ].filter((line) => line !== null).join('\n')
+  });
 
   const submitLead = async (form, lead) => {
     trackEvent('quote_submit_attempt', lead.kind === 'quote' ? { service: lead.service } : {});
@@ -538,6 +579,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (submitButton) submitButton.disabled = true;
       const details = {
         name: document.getElementById('quoteName').value.trim(),
+        contactMethod: document.getElementById('quoteContactMethod').value,
         contact: document.getElementById('quoteContact').value.trim(),
         service: quoteService.value,
         postcode: document.getElementById('quotePostcode').value.trim(),
@@ -547,7 +589,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const lead = {
         kind: 'quote',
         name: details.name,
-        contact_method: document.getElementById('quoteContactMethod').value,
+        contact_method: details.contactMethod,
         contact_details: details.contact,
         service: details.service,
         postcode: details.postcode,
@@ -560,30 +602,18 @@ document.addEventListener('DOMContentLoaded', () => {
         landing_page: window.location.pathname,
         attribution: campaign
       };
-      const fallbackMessage = [
-        '*RelyPro – Quote Request*',
-        '',
-        `Name: ${details.name}`,
-        `Phone or email: ${details.contact}`,
-        `Service: ${details.service}`,
-        `Postcode: ${details.postcode}`,
-        `Preferred date: ${details.date || 'Flexible'}`,
-        `Details: ${details.notes}`,
-        '',
-        'The website could not save this enquiry. Please confirm receipt.'
-      ].join('\n');
       try {
         const result = await submitLead(quoteForm, lead);
         sessionStorage.removeItem(LEAD_DRAFT_KEY);
         trackEvent('lead_capture_success', { service: details.service });
         showStatus(quoteForm, `Thank you. Your enquiry reference is ${result.reference}. Choose WhatsApp below if you would also like to start a chat.`, 'success');
-        renderFallbacks(quoteForm, `*RelyPro enquiry ${result.reference}*\nService: ${details.service}\nPreferred date: ${details.date || 'Flexible'}`);
+        renderFallbacks(quoteForm, quoteHandoff(details, result.reference));
       } catch (error) {
         trackEvent('lead_capture_failure', { error_class: error.message === 'validation_failed' ? 'validation' : 'unavailable' });
         if (!applyServerErrors(quoteForm, error.fields || {})) {
           showStatus(quoteForm, `We could not safely save the enquiry. Your entries remain on this page. Please try again or use one of the contact options below.`, 'warning');
         }
-        renderFallbacks(quoteForm, fallbackMessage);
+        renderFallbacks(quoteForm, quoteHandoff(details, '', true));
       } finally {
         if (submitButton) submitButton.disabled = false;
       }
@@ -601,14 +631,22 @@ document.addEventListener('DOMContentLoaded', () => {
       if (submitButton) submitButton.disabled = true;
       const subject = document.getElementById('contactSubject').value.trim();
       const customerMessage = document.getElementById('contactMessage').value.trim();
+      const details = {
+        name: document.getElementById('contactName').value.trim(),
+        email: document.getElementById('contactEmail').value.trim(),
+        subject,
+        message: customerMessage
+      };
       const lead = {
         kind: 'contact',
-        name: document.getElementById('contactName').value.trim(),
+        name: details.name,
         contact_method: 'email',
-        contact_details: document.getElementById('contactEmail').value.trim(),
+        contact_details: details.email,
         service: 'Other',
         postcode: '',
         property_summary: `${subject}: ${customerMessage}`,
+        subject,
+        message: customerMessage,
         preferred_date: '',
         privacy_acknowledged: document.getElementById('contactPrivacy').checked,
         website: contactForm.elements.website.value,
@@ -617,27 +655,18 @@ document.addEventListener('DOMContentLoaded', () => {
         landing_page: window.location.pathname,
         attribution: campaign
       };
-      const fallbackMessage = [
-        '*RelyPro – Contact Request*',
-        '',
-        `Name: ${document.getElementById('contactName').value.trim()}`,
-        `Email: ${document.getElementById('contactEmail').value.trim()}`,
-        `Subject: ${document.getElementById('contactSubject').value.trim()}`,
-        `Message: ${document.getElementById('contactMessage').value.trim()}`
-      ].join('\n');
-
       try {
         const result = await submitLead(contactForm, lead);
         sessionStorage.removeItem(LEAD_DRAFT_KEY);
         trackEvent('lead_capture_success');
         showStatus(contactForm, `Thank you. Your enquiry reference is ${result.reference}.`, 'success');
-        renderFallbacks(contactForm, `*RelyPro enquiry ${result.reference}*\nSubject: ${subject}`);
+        renderFallbacks(contactForm, contactHandoff(details, result.reference));
       } catch (error) {
         trackEvent('lead_capture_failure', { error_class: error.message === 'validation_failed' ? 'validation' : 'unavailable' });
         if (!applyServerErrors(contactForm, error.fields || {})) {
           showStatus(contactForm, 'We could not safely save the enquiry. Your entries remain on this page. Please try again or use a contact option below.', 'warning');
         }
-        renderFallbacks(contactForm, `${fallbackMessage}\n\nThe website could not save this enquiry. Please confirm receipt.`);
+        renderFallbacks(contactForm, contactHandoff(details, '', true));
       } finally {
         if (submitButton) submitButton.disabled = false;
       }

@@ -1,5 +1,6 @@
 import { makeDeduplicationKey, makeReference, toStoredLead, validateLead } from '../../lib/lead-core.js';
 import { saveHubSpotLead } from '../../lib/hubspot-lead.js';
+import { recordLeadApiFailure, recordLeadApiSuccess } from '../../lib/lead-monitor.js';
 
 const json = (body, status = 200, headers = {}) => new Response(JSON.stringify(body), {
   status,
@@ -68,15 +69,20 @@ export async function onRequestPost({ request, env }) {
 
   const key = await makeDeduplicationKey(validation.lead);
   const existing = env.LEAD_DEDUPLICATION && await env.LEAD_DEDUPLICATION.get(key);
-  if (existing) return reply({ ok: true, reference: existing, duplicate: true });
+  if (existing) {
+    await recordLeadApiSuccess(env);
+    return reply({ ok: true, reference: existing, duplicate: true });
+  }
 
   const reference = makeReference();
   try {
     await saveLead(env, toStoredLead(validation.lead, reference));
     if (env.LEAD_DEDUPLICATION) await env.LEAD_DEDUPLICATION.put(key, reference, { expirationTtl: 86400 });
+    await recordLeadApiSuccess(env);
     return reply({ ok: true, reference });
   } catch (error) {
     const errorClass = error?.message === 'destination_unconfigured' ? 'unavailable' : 'upstream_failure';
+    await recordLeadApiFailure(env);
     console.error(JSON.stringify({ event: 'lead_capture_failed', error: errorClass }));
     return reply({ error: errorClass }, 503, { 'retry-after': '60' });
   }

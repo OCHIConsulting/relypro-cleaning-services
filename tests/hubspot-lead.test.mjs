@@ -26,9 +26,49 @@ test('maps a stored lead to HubSpot without dropping operational details', () =>
   assert.equal(deal.pipeline, 'default');
   assert.equal(deal.dealstage, 'appointmentscheduled');
   assert.equal(deal.enquiry_reference, 'RP-260813-ABC123');
+  assert.equal(deal.client_submission_id, 'submission-123456789');
+  assert.equal(deal.service_requested, 'Regular Cleaning');
+  assert.equal(deal.preferred_contact_channel, 'email');
   assert.equal(deal.postcode__service_area, 'DE1 2AB');
+  assert.equal(deal.property_summary, 'Synthetic test property, never a real customer.');
+  assert.equal(deal.landing_page, '/get-quote.html');
+  assert.equal(deal.utm_source, 'test');
+  assert.equal(deal.utm_medium, 'automation');
+  assert.match(deal.description, /Name: Synthetic Customer/);
+  assert.match(deal.description, /Preferred reply: email/);
+  assert.match(deal.description, /Contact details: customer@example\.invalid/);
+  assert.match(deal.description, /Service: Regular Cleaning/);
+  assert.match(deal.description, /Postcode: DE1 2AB/);
+  assert.match(deal.description, /What would you like cleaned\?: Synthetic test property, never a real customer\./);
+  assert.match(deal.description, /Preferred date: 2026-08-20/);
+  assert.match(deal.description, /Landing page: \/get-quote\.html/);
+  assert.match(deal.description, /UTM source: test/);
+  assert.match(deal.description, /UTM medium: automation/);
   assert.match(deal.description, /Marketing consent: No/);
   assert.match(deal.description, /UTM campaign: synthetic/);
+});
+
+test('keeps contact-form subject and message as separately labelled HubSpot details', () => {
+  const { deal } = toHubSpotRecords({
+    enquiry_reference: 'RP-260813-CONTACT',
+    client_submission_id: 'submission-contact-1234',
+    created_at: '2026-08-13T12:00:00.000Z',
+    kind: 'contact',
+    name: 'Synthetic Enquirer',
+    contact_method: 'email',
+    contact_details: 'enquirer@example.invalid',
+    service: 'Other',
+    postcode: '',
+    property_summary: 'Availability: Please confirm Saturday availability.',
+    subject: 'Availability',
+    message: 'Please confirm Saturday availability.',
+    preferred_date: null,
+    privacy_acknowledged: true,
+    landing_page: '/contact.html',
+    attribution: {}
+  });
+  assert.match(deal.description, /Subject: Availability/);
+  assert.match(deal.description, /Message: Please confirm Saturday availability\./);
 });
 
 test('upserts the contact before creating its associated deal', async (context) => {

@@ -35,12 +35,20 @@ The free pipeline supports one closed-won and one closed-lost stage. `Completed`
 | `contact_details` | email or phone | Route by method; do not invent missing values |
 | `service` | custom service property | Canonical values from `SERVICES` |
 | `postcode` | postal code | Quote leads only; retain spacing |
-| `property_summary` | deal description / note | Private sales requirement; exclude from analytics |
-| `preferred_date` | custom preferred service date | Date only |
+| `property_summary` | custom `property_summary` and private deal description | Quote label is “What would you like cleaned?”; duplicate into the description so it is visible even when the custom property is not on the record sidebar; exclude from analytics |
+| `subject`, `message` | private deal description | Contact-form values remain separately labelled; exclude from analytics |
+| `preferred_date` | private deal description | Date only; no custom slot remains on HubSpot Free |
 | `landing_page` | first conversion page | Path only, no query string |
 | `attribution.*` | original source detail/custom UTM fields | Source, medium, campaign only |
 | `stage` | deal stage | Begin at New enquiry |
 | `marketing_consent` | marketing permission | Always false for this flow |
+
+Every deal description also carries the reference, received time, enquiry type,
+name, preferred reply method, contact details, service, postcode, cleaning details
+or contact subject/message, preferred date, landing page, source/medium/campaign,
+privacy acknowledgement and the fixed no-marketing-consent state. This readable
+copy is deliberate: HubSpot Free's ten custom-property limit must not cause a
+submitted form field to disappear from the sales record.
 
 ## Pipeline and ownership
 

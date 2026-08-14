@@ -1,0 +1,35 @@
+name: Monitor production lead capture
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-lead-health
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check privacy-safe lead health endpoint
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            status="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' \
+              --connect-timeout 10 --max-time 20 \
+              https://relypro.co.uk/api/leads-health || true)"
+            if [ "$status" = "200" ]; then
+              echo "Lead health check passed."
+              exit 0
+            fi
+            echo "Lead health check attempt ${attempt} returned HTTP ${status:-000}."
+            if [ "$attempt" -lt 3 ]; then sleep 20; fi
+          done
+          echo "Lead capture health remained unhealthy after three checks."
+          exit 1

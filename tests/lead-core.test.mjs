@@ -55,3 +55,18 @@ test('stored lead starts in the documented pipeline and never implies marketing 
   assert.equal(stored.marketing_consent, false);
   assert.equal(stored.enquiry_reference, 'RP-260813-ABC123');
 });
+
+test('retains separately labelled contact-form subject and message', () => {
+  const result = validateLead({
+    ...validLead,
+    kind: 'contact',
+    service: 'Other',
+    postcode: '',
+    subject: 'Synthetic subject',
+    message: 'Synthetic contact message for mapping verification.',
+    property_summary: 'Synthetic subject: Synthetic contact message for mapping verification.'
+  }, now);
+  assert.equal(result.ok, true);
+  assert.equal(result.lead.subject, 'Synthetic subject');
+  assert.equal(result.lead.message, 'Synthetic contact message for mapping verification.');
+});

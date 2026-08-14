@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { onRequestOptions, onRequestPost } from '../functions/api/leads.js';
+import { onRequestGet as getHealth } from '../functions/api/leads-health.js';
 
 const payload = () => ({
   kind: 'quote',
@@ -52,6 +53,43 @@ test('does not return false success or log personal data when storage is unconfi
   assert.deepEqual(await response.json(), { error: 'unavailable' });
   assert.deepEqual(logs, [JSON.stringify({ event: 'lead_capture_failed', error: 'unavailable' })]);
   assert.doesNotMatch(logs.join('\n'), /Synthetic Customer|customer@example\.invalid|DE1 2AB|192\.0\.2\.11|property_summary/);
+});
+
+test('exposes only a non-personal sustained-5xx health state and clears it after success', async (context) => {
+  const originalConsoleError = console.error;
+  console.error = () => {};
+  context.after(() => { console.error = originalConsoleError; });
+  const records = new Map();
+  const env = {
+    LEAD_DEDUPLICATION: {
+      get: async (key) => records.get(key),
+      put: async (key, value) => records.set(key, value)
+    }
+  };
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const lead = payload();
+    lead.client_submission_id = `health-failure-${attempt}-123456`;
+    const response = await onRequestPost({ request: request(lead, `192.0.2.${20 + attempt}`), env });
+    assert.equal(response.status, 503);
+  }
+
+  const degraded = await getHealth({ env });
+  assert.equal(degraded.status, 503);
+  assert.deepEqual(await degraded.json(), { ok: false, status: 'sustained_5xx' });
+
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(null, { status: 204 });
+  context.after(() => { globalThis.fetch = originalFetch; });
+  env.LEAD_DESTINATION_URL = 'https://destination.example.invalid/leads';
+  const recovery = payload();
+  recovery.client_submission_id = 'health-recovery-123456';
+  const recoveredLead = await onRequestPost({ request: request(recovery, '192.0.2.30'), env });
+  assert.equal(recoveredLead.status, 200);
+
+  const healthy = await getHealth({ env });
+  assert.equal(healthy.status, 200);
+  assert.deepEqual(await healthy.json(), { ok: true, status: 'healthy' });
 });
 
 test('persists once and returns the prior reference on an idempotent retry', async (context) => {

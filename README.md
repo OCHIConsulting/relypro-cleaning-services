@@ -36,25 +36,23 @@ npm start
 Run `npm test` before publishing. See `BLOG-WORKFLOW.md` for the Pages CMS and
 AI-assisted publishing process.
 
-### Option A: GitHub Pages (simple & free)
-1. Push this repo to GitHub on the `main` branch.
-2. In GitHub: Settings → Pages → Source: `GitHub Actions` → Save.
-3. Optional: Set a custom domain under Settings → Pages → Custom domain.
-4. DNS: Add a CNAME for `www` → `ochiconsulting.github.io` (or your username). Add apex A records (GitHub Pages IPs) or forward apex to `www`.
-5. Enable “Enforce HTTPS” after the certificate is issued.
+Production runs on the Git-integrated Cloudflare Pages project
+`relypro-cleaning-services`. Cloudflare builds approved changes from `main` with
+`npm run build`, publishes `_site`, applies `_headers`, and runs the Pages Functions
+under `functions/`. Pull requests and pushes still run the GitHub build-and-test
+workflow, but GitHub Pages is no longer a production deployment target.
 
-### Option B: Cloudflare Pages (required for the included lead endpoint)
-1. Create a project in Cloudflare Pages only after hosting and data-processing approval.
-2. Connect GitHub. Build command: `npm run build`. Output directory: `_site`.
-3. Add your custom domain in the project → it will guide DNS.
-
-The included `_headers` file configures security and cache headers on hosts that support the Netlify/Cloudflare Pages headers format. GitHub Pages ignores this file; use Cloudflare in front of GitHub Pages or a host with configurable response headers.
+Configuration shared with the repository is in `wrangler.jsonc`. Secrets and the
+production KV binding remain in Cloudflare, never in Git. Cloudflare branch previews
+should be used to validate changes before an approved production merge.
 
 ## Forms & Messaging
 
 The quote and contact forms are prepared for first-party lead capture through the provider-neutral endpoint in `functions/api/leads.js`. Success is shown only after the configured destination accepts the record; otherwise entries remain available and the visitor receives phone, email and WhatsApp fallbacks. WhatsApp is always a reviewable customer-controlled handoff. The careers form retains its existing WhatsApp-only journey.
 
-GitHub Pages does not execute the endpoint, so production lead capture remains integration-ready rather than active. See `docs/PHASE-1-IMPLEMENTATION.md` before changing hosting or connecting a CRM.
+Cloudflare Pages executes the endpoint in production. See
+`docs/PHASE-1-IMPLEMENTATION.md` and `docs/MONITORING-AND-RESPONSE.md` before
+changing hosting, monitoring or CRM configuration.
 
 ## Analytics and Search Setup
 

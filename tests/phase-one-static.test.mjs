@@ -37,6 +37,18 @@ test('client only reports lead success after an accepted API response', async ()
   assert.ok(responseCheck > -1 && successEvent > responseCheck);
 });
 
+test('email and WhatsApp handoffs include every visible quote and contact field', async () => {
+  const source = await read('assets/js/main.js');
+  assert.match(source, /mailto:\$\{BUSINESS_EMAIL\}\?subject=\$\{encodeURIComponent\(emailSubject\)\}&body=\$\{encodeURIComponent\(message\)\}/);
+  for (const label of [
+    'Name:', 'Preferred reply:', 'Contact details:', 'Service:', 'Postcode:',
+    'What would you like cleaned?:', 'Preferred date:', 'Email:', 'Subject:', 'Message:',
+    'Privacy notice acknowledged: Yes'
+  ]) {
+    assert.match(source, new RegExp(label.replace(/[?]/g, '\\?')));
+  }
+});
+
 test('privacy notice identifies the website and CRM processors', async () => {
   const html = await read('privacy.html');
   assert.match(html, /Cloudflare to host and protect the website and to process enquiry submissions/);

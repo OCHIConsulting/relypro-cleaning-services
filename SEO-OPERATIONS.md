@@ -6,6 +6,12 @@ actions cannot be completed from the public website repository.
 
 ## 1. Google Search Console
 
+Status on 14 August 2026: the `relypro.co.uk` domain property is verified and
+accessible in the RelyPro Google account. `https://relypro.co.uk/sitemap.xml` was
+submitted on 26 July, read successfully on 11 August, and reports 37 discovered
+pages. The homepage and all five dedicated service pages were confirmed indexed
+and added to Google's priority crawl queue on 14 August.
+
 1. Add the `relypro.co.uk` domain property in Search Console.
 2. Complete DNS verification with the TXT record Google provides.
 3. Submit `https://relypro.co.uk/sitemap.xml`.
@@ -16,6 +22,18 @@ Do not add a made-up verification token to the HTML. Use the exact value provide
 for the verified Google account.
 
 ## 2. Analytics activation
+
+Status on 14 August 2026: the in-app RelyPro Google account has access to the
+`RelyPro Cleaning Services` property and web stream. Stream URL and measurement ID
+match production (`https://relypro.co.uk`, `G-M2JVHYSZ9D`), and data collection is
+active. `lead_capture_success`, `phone_click`, `email_click`, `whatsapp_click`, and
+`whatsapp_handoff` are configured as key events without default monetary values.
+Lead success counts once per event; the newly registered email and handoff events
+count once per session. `phone_click` and `whatsapp_click` already have stream data;
+the other registered names begin counting when the website first sends them. A
+consented live check showed one active UK user and delivered `consent_update` and
+`email_click` to GA4 Realtime; the collection request contained the measurement ID,
+event name and non-personal configuration only.
 
 Each page now contains the active GA4 web-stream ID:
 
@@ -96,15 +114,29 @@ not the generic homepage.
 
 ## 5. Hosting headers
 
-The `_headers` file provides a deployable security and cache policy for hosts such as
-Cloudflare Pages or Netlify. GitHub Pages ignores `_headers`; while GitHub Pages
-remains the origin, activate equivalent response headers through Cloudflare or move
-the deployment to a host that supports them.
+The production Cloudflare Pages deployment applies the security and cache policy in
+`_headers`. GitHub remains the source repository and Pages CMS content store; it is
+not the production web host.
 
 Review the Content Security Policy after adding any new payment, scheduling,
 analytics or CRM domain.
 
-## 6. Business details to confirm before publishing legal pages
+## 6. Source-to-revenue reporting
+
+Use the HubSpot deal pipeline as the outcome system and GA4 only for consented,
+non-personal acquisition events. The weekly report should group by UTM source and
+medium (falling back to `direct / none`) and show: enquiries created, requirements
+confirmed, quotes sent, bookings, completed jobs, completed revenue, enquiry-to-quote
+rate, quote-to-booking rate and revenue per enquiry.
+
+Use HubSpot create date for the reporting cohort, `utm_source`/`utm_medium` for
+acquisition, deal stage for quote and booking milestones, and built-in deal amount
+plus close date for completed revenue. Do not export names, contact details,
+postcodes, property summaries, enquiry references or CRM record IDs into GA4 or the
+management summary. See `docs/MEASUREMENT-AND-REVENUE-REPORTING.md` for the exact
+definitions and reconciliation checks.
+
+## 7. Business details to confirm before publishing legal pages
 
 Add the following to the privacy notice and footer if applicable:
 
