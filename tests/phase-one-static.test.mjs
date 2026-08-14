@@ -49,6 +49,20 @@ test('email and WhatsApp handoffs include every visible quote and contact field'
   }
 });
 
+test('every source page uses the current JavaScript cache-busting release', async () => {
+  const release = 'assets/js/main.js?v=20260814-complete-leads';
+  const pages = [
+    'about.html', 'airbnb-turnover-cleaning-derby.html', 'areas.html', 'careers.html',
+    'carpet-cleaning-derby.html', 'contact.html', 'cookies.html', 'deep-cleaning-derby.html',
+    'end-of-tenancy-cleaning-derby.html', 'get-quote.html', 'index.html',
+    'office-cleaning-derby.html', 'privacy.html', 'services.html', 'terms.html'
+  ];
+  for (const page of pages) {
+    assert.match(await read(page), new RegExp(release.replace(/[.?]/g, '\\$&')));
+  }
+  assert.match(await read('src/_includes/layouts/base.njk'), /\/assets\/js\/main\.js\?v=20260814-complete-leads/);
+});
+
 test('privacy notice identifies the website and CRM processors', async () => {
   const html = await read('privacy.html');
   assert.match(html, /Cloudflare to host and protect the website and to process enquiry submissions/);
