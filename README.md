@@ -43,18 +43,18 @@ AI-assisted publishing process.
 4. DNS: Add a CNAME for `www` → `ochiconsulting.github.io` (or your username). Add apex A records (GitHub Pages IPs) or forward apex to `www`.
 5. Enable “Enforce HTTPS” after the certificate is issued.
 
-### Option B: Cloudflare Pages (fast CDN & free SSL)
-1. Create a project in Cloudflare Pages → Direct Upload (or connect GitHub).
-2. Framework preset: None. Build command: none. Output directory: `/`.
+### Option B: Cloudflare Pages (required for the included lead endpoint)
+1. Create a project in Cloudflare Pages only after hosting and data-processing approval.
+2. Connect GitHub. Build command: `npm run build`. Output directory: `_site`.
 3. Add your custom domain in the project → it will guide DNS.
 
 The included `_headers` file configures security and cache headers on hosts that support the Netlify/Cloudflare Pages headers format. GitHub Pages ignores this file; use Cloudflare in front of GitHub Pages or a host with configurable response headers.
 
 ## Forms & Messaging
 
-The quote, contact, and careers forms create a pre-filled WhatsApp message and explicitly ask the visitor to review and send it. No form data is sent silently to an unverified third-party endpoint.
+The quote and contact forms are prepared for first-party lead capture through the provider-neutral endpoint in `functions/api/leads.js`. Success is shown only after the configured destination accepts the record; otherwise entries remain available and the visitor receives phone, email and WhatsApp fallbacks. WhatsApp is always a reviewable customer-controlled handoff. The careers form retains its existing WhatsApp-only journey.
 
-Because the site is static, it records a `quote_handoff` when WhatsApp opens—not a verified lead submission. Use a consent-aware server-side form or CRM integration if verified submissions, lead stages, and revenue attribution are required.
+GitHub Pages does not execute the endpoint, so production lead capture remains integration-ready rather than active. See `docs/PHASE-1-IMPLEMENTATION.md` before changing hosting or connecting a CRM.
 
 ## Analytics and Search Setup
 

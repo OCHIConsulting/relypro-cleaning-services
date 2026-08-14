@@ -36,24 +36,27 @@ After deployment:
 
 Implemented events:
 
-- `form_start`
+- `quote_start`
+- `quote_submit_attempt`
+- `lead_capture_success`
+- `lead_capture_failure`
+- `form_start` (non-quote forms)
 - `service_selected`
 - `quote_click`
 - `phone_click`
 - `email_click`
 - `whatsapp_click`
-- `quote_handoff`
-- `contact_handoff`
+- `whatsapp_handoff` (post-capture or clearly labelled fallback)
 - `careers_handoff`
 - `consent_update`
 
-The static site can measure a WhatsApp handoff, but it cannot prove that the person
-pressed Send, that a quote was issued, or that revenue was booked. Import booked-job
-and revenue outcomes from the CRM into analytics using a stable lead ID once a
-server-side lead endpoint or CRM is introduced.
+The site can measure a successful lead capture and a WhatsApp handoff, but it cannot
+prove that the person pressed Send, that a quote was issued, or that revenue was
+booked. Join booked-job and revenue outcomes inside approved reporting; never send
+the enquiry reference, CRM record ID, or customer data to GA4.
 
 For the Airbnb turnover campaign, use `utm_campaign=airbnb_turnovers` consistently
-across partner links and adverts. Segment `service_selected` and `quote_handoff`
+across partner links and adverts. Segment `service_selected` and `lead_capture_success`
 events where `service` is `Airbnb Turnover Cleaning`.
 
 ## 3. Local listing consistency
