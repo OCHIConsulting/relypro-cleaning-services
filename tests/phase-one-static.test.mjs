@@ -61,7 +61,7 @@ test('email and WhatsApp handoffs include every visible quote and contact field'
 });
 
 test('every source page uses the current JavaScript cache-busting release', async () => {
-  const release = 'assets/js/main.js?v=20260814-company-phone';
+  const release = 'assets/js/main.js?v=20260814-company-phone-r2';
   const pages = [
     'about.html', 'airbnb-turnover-cleaning-derby.html', 'areas.html', 'careers.html',
     'carpet-cleaning-derby.html', 'contact.html', 'cookies.html', 'deep-cleaning-derby.html',
@@ -71,7 +71,7 @@ test('every source page uses the current JavaScript cache-busting release', asyn
   for (const page of pages) {
     assert.match(await read(page), new RegExp(release.replace(/[.?]/g, '\\$&')));
   }
-  assert.match(await read('src/_includes/layouts/base.njk'), /\/assets\/js\/main\.js\?v=20260814-company-phone/);
+  assert.match(await read('src/_includes/layouts/base.njk'), /\/assets\/js\/main\.js\?v=20260814-company-phone-r2/);
 });
 
 test('privacy notice identifies the website and CRM processors', async () => {
