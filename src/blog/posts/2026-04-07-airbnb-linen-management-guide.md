@@ -10,7 +10,7 @@ featured: true
 draft: false
 readingTime: 8
 serviceLabel: Build linen resets into every guest turnover
-serviceUrl: /get-quote.html?service=Airbnb%20Turnover%20Cleaning
+serviceUrl: /get-quote?service=Airbnb%20Turnover%20Cleaning
 ---
 Linen can become the critical path in an Airbnb turnover. The apartment may be clean, but check-in cannot proceed if bedding is still drying, a duvet cover is stained or the correct towel sizes are at another property.
 

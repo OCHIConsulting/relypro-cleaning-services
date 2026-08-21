@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const BUSINESS_EMAIL = 'enquiries@relypro.co.uk';
   const CONSENT_KEY = 'relyproConsent';
   const CAMPAIGN_KEY = 'relyproCampaign';
+  const ANALYTICS_TEST_KEY = 'relyproAnalyticsTest';
   const LEAD_DRAFT_KEY = 'relyproLeadDraft';
   const CONSENT_MAX_AGE_MS = 180 * 24 * 60 * 60 * 1000;
   const SAFE_ANALYTICS_PARAMETERS = new Set([
@@ -123,6 +124,12 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const query = new URLSearchParams(window.location.search);
+  if (query.get('rp_test') === '1') {
+    sessionStorage.setItem(ANALYTICS_TEST_KEY, 'true');
+  } else if (query.get('rp_test') === '0') {
+    sessionStorage.removeItem(ANALYTICS_TEST_KEY);
+  }
+  const analyticsTestSession = sessionStorage.getItem(ANALYTICS_TEST_KEY) === 'true';
   const campaignFromUrl = {};
   ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'gclid'].forEach((key) => {
     const value = query.get(key);
@@ -206,7 +213,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.gtag('config', analyticsId, {
       anonymize_ip: true,
       allow_google_signals: false,
-      allow_ad_personalization_signals: false
+      allow_ad_personalization_signals: false,
+      ...(analyticsTestSession ? { debug_mode: true } : {})
     });
 
     const script = document.createElement('script');
@@ -310,7 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
     bar.innerHTML = `
       <a href="tel:+447796584056" data-track="phone_click"><i class="fa-solid fa-phone" aria-hidden="true"></i><span>Call</span></a>
       <a href="https://wa.me/${BUSINESS_PHONE}" data-track="whatsapp_click"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i><span>WhatsApp</span></a>
-      <a href="get-quote.html" data-track="quote_click"><i class="fa-solid fa-file-signature" aria-hidden="true"></i><span>Get quote</span></a>
+      <a href="/get-quote" data-track="quote_click"><i class="fa-solid fa-file-signature" aria-hidden="true"></i><span>Get quote</span></a>
     `;
     document.body.appendChild(bar);
   };

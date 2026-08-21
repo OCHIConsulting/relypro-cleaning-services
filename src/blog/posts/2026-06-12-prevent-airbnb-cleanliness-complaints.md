@@ -10,7 +10,7 @@ featured: true
 draft: false
 readingTime: 8
 serviceLabel: Protect guest experience with consistent turnovers
-serviceUrl: /get-quote.html?service=Airbnb%20Turnover%20Cleaning
+serviceUrl: /get-quote?service=Airbnb%20Turnover%20Cleaning
 ---
 Most cleanliness complaints are not caused by one dramatic failure. They come from small, highly visible details: hair on bedding, crumbs in a drawer, a marked glass or an unpleasant smell when the door opens.
 

@@ -13,7 +13,7 @@ featured: true
 draft: false
 readingTime: 7
 serviceLabel: Keep every stay guest-ready
-serviceUrl: /get-quote.html?service=Airbnb%20Turnover%20Cleaning
+serviceUrl: /get-quote?service=Airbnb%20Turnover%20Cleaning
 ---
 An Airbnb turnover is more than a quick clean. It is the short window in which a property must be checked, reset and made ready for the next guest. A repeatable checklist helps hosts avoid missed items when checkout and check-in times are close together.
 

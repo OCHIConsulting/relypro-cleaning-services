@@ -21,7 +21,7 @@ export default {
     { path: "/areas.html", lastmod: "2026-07-26", changefreq: "monthly", priority: "0.8" },
     { path: "/about.html", lastmod: "2026-07-26", changefreq: "yearly", priority: "0.6" },
     { path: "/contact.html", lastmod: "2026-07-26", changefreq: "yearly", priority: "0.7" },
-    { path: "/get-quote.html", lastmod: "2026-07-26", changefreq: "yearly", priority: "0.8" },
+    { path: "/get-quote", lastmod: "2026-08-21", changefreq: "yearly", priority: "0.8" },
     { path: "/careers.html", lastmod: "2026-07-26", changefreq: "monthly", priority: "0.5" },
     { path: "/privacy.html", lastmod: "2026-07-26", changefreq: "yearly", priority: "0.2" },
     { path: "/cookies.html", lastmod: "2026-07-26", changefreq: "yearly", priority: "0.2" },

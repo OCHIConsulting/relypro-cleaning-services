@@ -10,7 +10,7 @@ featured: true
 draft: false
 readingTime: 8
 serviceLabel: Add planned deep cleaning to your Airbnb operation
-serviceUrl: /get-quote.html?service=Airbnb%20Turnover%20Cleaning
+serviceUrl: /get-quote?service=Airbnb%20Turnover%20Cleaning
 ---
 Every guest turnover should deliver a clean, safe and presentable property. A deep clean goes further by addressing tasks that cannot reasonably fit into each checkout-to-check-in window.
 

@@ -10,7 +10,7 @@ featured: false
 draft: false
 readingTime: 7
 serviceLabel: Get help with carpet stains and deep cleaning
-serviceUrl: /get-quote.html?service=Carpet%20Cleaning
+serviceUrl: /get-quote?service=Carpet%20Cleaning
 ---
 The first few minutes after a spill can make a significant difference, but rushing to apply the strongest product in the cupboard can make the problem worse.
 

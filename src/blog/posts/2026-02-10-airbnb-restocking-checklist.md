@@ -10,7 +10,7 @@ featured: false
 draft: false
 readingTime: 8
 serviceLabel: Combine cleaning and restocking in one turnover
-serviceUrl: /get-quote.html?service=Airbnb%20Turnover%20Cleaning
+serviceUrl: /get-quote?service=Airbnb%20Turnover%20Cleaning
 ---
 Restocking looks simple until several reservations overlap, one apartment uses the last toilet roll and nobody knows whether more coffee is in the cleaner’s car or the locked cupboard.
 

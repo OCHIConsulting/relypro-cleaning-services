@@ -10,7 +10,7 @@ featured: true
 draft: false
 readingTime: 8
 serviceLabel: Get a tailored Airbnb turnover price
-serviceUrl: /get-quote.html?service=Airbnb%20Turnover%20Cleaning
+serviceUrl: /get-quote?service=Airbnb%20Turnover%20Cleaning
 ---
 Airbnb cleaning prices are easiest to compare when every quote covers the same work. A low headline price may exclude linen, restocking, multiple bathrooms or the time needed for a guest-ready inspection.
 

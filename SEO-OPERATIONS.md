@@ -35,6 +35,12 @@ consented live check showed one active UK user and delivered `consent_update` an
 `email_click` to GA4 Realtime; the collection request contained the measurement ID,
 event name and non-personal configuration only.
 
+Status on 21 August 2026: the verified `relypro.co.uk` Search Console domain
+property is linked to the RelyPro GA4 web stream. Controlled test sessions must
+start with `?rp_test=1`; the flag persists only for that browser tab's session and
+sends GA4 debug traffic for exclusion by the **RelyPro developer traffic** filter.
+Use `?rp_test=0` to end test mode in the same tab before normal browsing.
+
 Each page now contains the active GA4 web-stream ID:
 
 ```html

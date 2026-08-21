@@ -10,7 +10,7 @@ featured: false
 draft: false
 readingTime: 8
 serviceLabel: Agree a detailed deep-cleaning checklist
-serviceUrl: /get-quote.html?service=Deep%20Cleaning
+serviceUrl: /get-quote?service=Deep%20Cleaning
 ---
 A professional deep clean should be defined by a checklist, not a vague promise that everything will be spotless. Property size, starting condition, access and optional specialist tasks all affect what can be completed.
 

@@ -10,7 +10,7 @@ featured: true
 draft: false
 readingTime: 8
 serviceLabel: Discuss your cleaning priorities with RelyPro
-serviceUrl: /get-quote.html
+serviceUrl: /get-quote
 ---
 Choosing a cleaner involves trust as well as price. Someone may hold keys, enter an occupied home or represent your business before staff and guests arrive.
 
@@ -144,4 +144,4 @@ Before booking, confirm:
 - Cancellation and re-clean terms are understood
 - You know who to contact on the day
 
-RelyPro provides residential, short-let and commercial cleaning across Derby. Send the service, postcode and a short description through our [quote form](/get-quote.html) and we will ask for any further information needed for a clear proposal.
+RelyPro provides residential, short-let and commercial cleaning across Derby. Send the service, postcode and a short description through our [quote form](/get-quote) and we will ask for any further information needed for a clear proposal.

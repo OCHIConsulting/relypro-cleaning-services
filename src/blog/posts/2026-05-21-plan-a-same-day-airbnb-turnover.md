@@ -10,7 +10,7 @@ featured: true
 draft: false
 readingTime: 9
 serviceLabel: Make same-day turnovers more dependable
-serviceUrl: /get-quote.html?service=Airbnb%20Turnover%20Cleaning
+serviceUrl: /get-quote?service=Airbnb%20Turnover%20Cleaning
 ---
 A same-day turnover is a timed operational process. The work begins when the previous guest leaves and ends only when the property has been inspected, restocked and secured for the next arrival.
 

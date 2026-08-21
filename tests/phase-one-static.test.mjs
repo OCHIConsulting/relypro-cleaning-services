@@ -47,6 +47,20 @@ test('client only reports lead success after an accepted API response', async ()
   assert.ok(responseCheck > -1 && successEvent > responseCheck);
 });
 
+test('controlled test sessions are marked as GA4 debug traffic', async () => {
+  const source = await read('assets/js/main.js');
+  assert.match(source, /query\.get\('rp_test'\) === '1'/);
+  assert.match(source, /analyticsTestSession \? \{ debug_mode: true \} : \{\}/);
+});
+
+test('quote-page canonical metadata uses the Cloudflare extensionless URL', async () => {
+  const html = await read('get-quote.html');
+  const sitemap = await read('sitemap.xml');
+  assert.match(html, /rel="canonical" href="https:\/\/relypro\.co\.uk\/get-quote"/);
+  assert.doesNotMatch(html, /https:\/\/relypro\.co\.uk\/get-quote\.html/);
+  assert.match(sitemap, /https:\/\/relypro\.co\.uk\/get-quote<\/loc>/);
+});
+
 test('email and WhatsApp handoffs include every visible quote and contact field', async () => {
   const source = await read('assets/js/main.js');
   assert.match(source, /mailto:\$\{BUSINESS_EMAIL\}\?subject=\$\{encodeURIComponent\(emailSubject\)\}&body=\$\{encodeURIComponent\(message\)\}/);
@@ -61,7 +75,7 @@ test('email and WhatsApp handoffs include every visible quote and contact field'
 });
 
 test('every source page uses the current JavaScript cache-busting release', async () => {
-  const release = 'assets/js/main.js?v=20260814-company-phone-r2';
+  const release = 'assets/js/main.js?v=20260821-analytics-quality';
   const pages = [
     'about.html', 'airbnb-turnover-cleaning-derby.html', 'areas.html', 'careers.html',
     'carpet-cleaning-derby.html', 'contact.html', 'cookies.html', 'deep-cleaning-derby.html',
@@ -71,7 +85,7 @@ test('every source page uses the current JavaScript cache-busting release', asyn
   for (const page of pages) {
     assert.match(await read(page), new RegExp(release.replace(/[.?]/g, '\\$&')));
   }
-  assert.match(await read('src/_includes/layouts/base.njk'), /\/assets\/js\/main\.js\?v=20260814-company-phone-r2/);
+  assert.match(await read('src/_includes/layouts/base.njk'), /\/assets\/js\/main\.js\?v=20260821-analytics-quality/);
 });
 
 test('privacy notice identifies the website and CRM processors', async () => {
