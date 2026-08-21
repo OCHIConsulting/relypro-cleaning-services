@@ -52,3 +52,25 @@ Columns and definitions:
 
 Review the definitions after four weeks of real use before purchasing an attribution
 or business-intelligence product.
+
+## Live HubSpot reporting setup (14 August 2026)
+
+The private dashboard **RelyPro Weekly Source-to-Revenue** and private report
+**RelyPro weekly funnel totals** are created in HubSpot. The report covers contacts
+created/worked and deals created/won for the recent period and is the supported
+Free-plan funnel summary. Internal dashboard and report identifiers are deliberately
+excluded from this public repository.
+
+Use the dashboard weekly alongside the saved **RelyPro overdue follow-ups** deal
+view. Pipeline stage, built-in Amount, Close date and Closed lost reason remain the
+authoritative CRM outcome fields. Do not enter assumed quote or revenue values and
+exclude records whose names or notes mark them as synthetic tests.
+
+HubSpot Free did not expose the required custom cross-object/source funnel builder
+during setup. The exact source/medium cohort table defined above therefore remains
+the reporting specification: produce it from a privacy-minimised deal export until
+the portal supports the custom report without an upgrade, or until a paid reporting
+change is separately approved. This limitation does not block daily ownership,
+follow-up, stage, quote, booking, completed-revenue or loss-reason recording.
+
+No scheduled dashboard email or customer communication automation is enabled.

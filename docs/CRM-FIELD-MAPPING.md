@@ -59,6 +59,19 @@ Stages: New enquiry -> Contact attempted -> Requirements confirmed -> Quote bein
 
 Every open lead needs one named owner, `next_action`, and `next_action_date`. At intake, assign by service/rota; if no routing rule matches, assign to the sales inbox owner. Record quote value only when prepared, booked/completed dates when confirmed, revenue from completed work, and a controlled loss reason (`price`, `timing`, `outside area`, `service unavailable`, `no response`, `competitor`, `duplicate`, `other`). Free-text notes supplement rather than replace these fields.
 
+### Live daily operating setup (14 August 2026)
+
+- All five RelyPro enquiry deals present during setup were assigned to **Osazee Odigie (`admin@relypro.co.uk`)**. The HubSpot sample deal was deliberately excluded.
+- Each RelyPro enquiry has a high-priority internal follow-up task due at 08:00 BST on 17 August 2026, assigned to the same owner, with a reminder at the task due time.
+- The saved deal view **RelyPro overdue follow-ups** uses the dynamic condition `Next Activity Date is more than 0 days ago`. It therefore shows enquiries whose next activity is before the start of today; it is expected to be empty while every follow-up is still current.
+- The daily rule is: open the overdue view, complete or reschedule every due task, keep the deal stage current, and ensure every open deal still has a next activity and date.
+- At `Quote being prepared`, enter the proposed value in built-in **Amount**. At `Quote sent`, confirm the value and create the follow-up task. Move a confirmed job to `Booked`, then to `Completed` only after delivery; the final Amount is recognised as completed revenue. For `Lost / not proceeding`, populate built-in **Closed lost reason** with the controlled reason before closing.
+- Customer emails, WhatsApp messages and other outbound messages remain human-approved. HubSpot task reminders are internal only; no customer-send automation was enabled.
+
+### Controlled production mapping evidence
+
+A controlled production submission created an associated HubSpot contact and deal. The record was synthetic and explicitly marked **Do not contact**. Visual inspection confirmed the optional company/property name, secondary phone number, service and full “What would you like cleaned?” response in HubSpot, while the generated email and WhatsApp handoff URLs contained every visible form field. Neither handoff was sent. Internal CRM identifiers are deliberately excluded from this public repository.
+
 ## Human-approved automation boundary
 
 Create internal tasks and message drafts only. Do not auto-send customer acknowledgement, follow-up, satisfaction, or review messages until tone, timing, opt-out handling, delivery records, and complaint suppression have been reviewed with real operations. Never request a review while a complaint is unresolved.
