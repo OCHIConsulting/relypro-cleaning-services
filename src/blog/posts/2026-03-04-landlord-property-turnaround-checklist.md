@@ -10,7 +10,7 @@ featured: false
 draft: false
 readingTime: 8
 serviceLabel: Plan a smoother change between tenancies
-serviceUrl: /get-quote.html?service=End%20of%20Tenancy%20Cleaning
+serviceUrl: /get-quote?service=End%20of%20Tenancy%20Cleaning
 ---
 The gap between tenants is often short, but cleaning is only one part of making a rental property ready. Keys, inventories, safety checks, repairs, meter readings and contractor access all need to happen in the correct order.
 

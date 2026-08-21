@@ -10,7 +10,7 @@ featured: false
 draft: false
 readingTime: 6
 serviceLabel: Make your next professional clean more effective
-serviceUrl: /get-quote.html?service=Deep%20Cleaning
+serviceUrl: /get-quote?service=Deep%20Cleaning
 ---
 You do not need to clean before the cleaner arrives. However, a small amount of preparation helps the team use paid time on dust, grease, bathrooms and floors rather than searching for access or moving everyday items.
 

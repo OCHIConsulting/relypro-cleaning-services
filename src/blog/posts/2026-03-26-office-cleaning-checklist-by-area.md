@@ -10,7 +10,7 @@ featured: false
 draft: false
 readingTime: 8
 serviceLabel: Turn your priorities into a written office specification
-serviceUrl: /get-quote.html?service=Office%20Cleaning
+serviceUrl: /get-quote?service=Office%20Cleaning
 ---
 A checklist makes an office cleaning agreement measurable. It tells the cleaner what to do, helps managers inspect the result and prevents low-visibility tasks from being forgotten.
 

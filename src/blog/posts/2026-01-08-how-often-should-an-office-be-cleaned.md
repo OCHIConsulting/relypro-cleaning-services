@@ -10,7 +10,7 @@ featured: false
 draft: false
 readingTime: 7
 serviceLabel: Create a cleaning schedule around your workplace
-serviceUrl: /get-quote.html?service=Office%20Cleaning
+serviceUrl: /get-quote?service=Office%20Cleaning
 ---
 There is no single cleaning frequency that suits every office. A quiet professional practice with six desks has different demands from a customer-facing workplace with shared kitchens, washrooms and a steady flow of visitors.
 

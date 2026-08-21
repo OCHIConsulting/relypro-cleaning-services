@@ -10,7 +10,7 @@ featured: false
 draft: false
 readingTime: 7
 serviceLabel: Improve washroom standards in your workplace
-serviceUrl: /get-quote.html?service=Office%20Cleaning
+serviceUrl: /get-quote?service=Office%20Cleaning
 ---
 Washrooms can make an otherwise well-maintained office feel poorly managed. A once-daily clean may be adequate for a lightly occupied site, while a busy workplace needs checks throughout the day.
 

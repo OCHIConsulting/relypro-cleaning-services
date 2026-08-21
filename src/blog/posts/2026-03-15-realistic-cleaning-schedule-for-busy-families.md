@@ -10,7 +10,7 @@ featured: false
 draft: false
 readingTime: 7
 serviceLabel: Get practical support with your home cleaning
-serviceUrl: /get-quote.html?service=Domestic%20Cleaning
+serviceUrl: /get-quote?service=Domestic%20Cleaning
 ---
 A useful cleaning schedule should make home life easier, not become another impossible standard. The best plan focuses first on hygiene and function, then distributes lower-priority tasks across the month.
 

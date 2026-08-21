@@ -10,7 +10,7 @@ featured: false
 draft: false
 readingTime: 8
 serviceLabel: Build a communal-area cleaning specification
-serviceUrl: /get-quote.html?service=Communal%20Area%20Cleaning
+serviceUrl: /get-quote?service=Communal%20Area%20Cleaning
 ---
 Communal areas shape how residents and visitors judge an apartment building. They also create practical challenges: constant foot traffic, shared responsibility, restricted access and seasonal mud.
 
@@ -158,4 +158,4 @@ Autumn leaves, winter grit and wetter weather can increase entrance demand. Parc
 
 Review complaints, actual visit time and repeated maintenance concerns at least periodically. Increase or redistribute work based on evidence rather than adding vague tasks.
 
-RelyPro serves apartment buildings and managed properties across our [Derby service areas](/areas.html). Share the building layout, apartment count, access arrangements and required frequencies through the [quote form](/get-quote.html?service=Communal%20Area%20Cleaning) for a site-specific proposal.
+RelyPro serves apartment buildings and managed properties across our [Derby service areas](/areas.html). Share the building layout, apartment count, access arrangements and required frequencies through the [quote form](/get-quote?service=Communal%20Area%20Cleaning) for a site-specific proposal.

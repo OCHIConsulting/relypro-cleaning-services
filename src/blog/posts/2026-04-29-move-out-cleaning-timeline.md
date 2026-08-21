@@ -10,7 +10,7 @@ featured: false
 draft: false
 readingTime: 7
 serviceLabel: Book an end-of-tenancy clean around your move
-serviceUrl: /get-quote.html?service=End%20of%20Tenancy%20Cleaning
+serviceUrl: /get-quote?service=End%20of%20Tenancy%20Cleaning
 ---
 Trying to pack and deep-clean an entire property on checkout day creates avoidable pressure. A seven-day plan separates preparation from the final clean and leaves time to correct anything missed.
 

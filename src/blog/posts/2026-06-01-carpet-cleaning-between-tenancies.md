@@ -10,7 +10,7 @@ featured: false
 draft: false
 readingTime: 7
 serviceLabel: Add carpet cleaning to your property turnaround
-serviceUrl: /get-quote.html?service=Carpet%20Cleaning
+serviceUrl: /get-quote?service=Carpet%20Cleaning
 ---
 Not every change of tenant requires carpet extraction, but every turnaround should include a careful carpet inspection. The decision depends on condition, material, odour, stains, occupancy and the standard recorded at the start of the tenancy.
 

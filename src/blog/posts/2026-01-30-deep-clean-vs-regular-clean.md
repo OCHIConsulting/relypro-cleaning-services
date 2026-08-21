@@ -10,7 +10,7 @@ featured: false
 draft: false
 readingTime: 7
 serviceLabel: Choose the right clean for your property
-serviceUrl: /get-quote.html?service=Deep%20Cleaning
+serviceUrl: /get-quote?service=Deep%20Cleaning
 ---
 “Deep clean” is used so widely that two quotes with the same label can describe very different jobs. The clearest way to compare services is to look at the starting condition, the agreed checklist and the time allocated.
 

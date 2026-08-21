@@ -10,7 +10,7 @@ featured: true
 draft: false
 readingTime: 9
 serviceLabel: Prepare your property for a thorough handover
-serviceUrl: /get-quote.html?service=End%20of%20Tenancy%20Cleaning
+serviceUrl: /get-quote?service=End%20of%20Tenancy%20Cleaning
 ---
 Moving out combines packing, administration and cleaning in a very short period. A room-by-room plan helps you avoid leaving the most time-consuming jobs until the final evening.
 

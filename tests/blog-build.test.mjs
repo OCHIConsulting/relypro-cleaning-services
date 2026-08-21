@@ -125,7 +125,7 @@ test('article output contains complete SEO and conversion metadata', () => {
   assert.match(html, /Airbnb Turnover Cleaning Checklist for Derby Hosts/);
   assert.match(
     html,
-    /href="\/get-quote\.html\?service=Airbnb%20Turnover%20Cleaning"/
+    /href="\/get-quote\?service=Airbnb%20Turnover%20Cleaning"/
   );
   assert.doesNotMatch(
     html,
@@ -188,7 +188,7 @@ test('the 2026 editorial collection contains 20 substantial new articles', () =>
     );
     assert.match(
       body,
-      /\]\(\/(?:airbnb-turnover-cleaning-derby|deep-cleaning-derby|end-of-tenancy-cleaning-derby|office-cleaning-derby|carpet-cleaning-derby|areas|get-quote)\.html/,
+      /\]\(\/(?:(?:airbnb-turnover-cleaning-derby|deep-cleaning-derby|end-of-tenancy-cleaning-derby|office-cleaning-derby|carpet-cleaning-derby|areas)\.html|get-quote)/,
       `${filename} must link to a relevant commercial page`
     );
   }
