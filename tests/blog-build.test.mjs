@@ -10,6 +10,13 @@ const articlePath =
 const sourcePostsRoot = resolve('src/blog/posts');
 const originalArticle =
   '2026-07-26-airbnb-turnover-cleaning-checklist-derby.md';
+const publishedSources = readdirSync(sourcePostsRoot)
+  .filter((name) => name.endsWith('.md'))
+  .map((name) => ({ name, source: readFileSync(resolve(sourcePostsRoot, name), 'utf8') }))
+  .filter(({ source }) => !/^draft: true$/m.test(source));
+const latestSlug = publishedSources
+  .sort((a, b) => b.source.match(/^date: (.+)$/m)[1].localeCompare(a.source.match(/^date: (.+)$/m)[1]))[0]
+  .source.match(/^slug: (.+)$/m)[1];
 
 test('existing static website remains in the generated output', () => {
   for (const path of [
@@ -59,20 +66,21 @@ test('blog index uses the RelyPro design and links to published posts', () => {
   assert.match(html, /class="nav-link active" href="\/blog\/">Blog<\/a>/);
   assert.match(
     html,
-    /href="\/blog\/airbnb-cleaning-cost-derby\/"/
+    new RegExp('href="/blog/' + latestSlug + '/"')
   );
 });
 
 test('blog archive features the latest post and paginates the remaining articles', () => {
   const firstPage = readOutput('blog/index.html');
   const secondPage = readOutput('blog/page/2/index.html');
-  const fifthPage = readOutput('blog/page/5/index.html');
+  const lastPageNumber = Math.ceil(publishedSources.length / 5);
+  const lastPage = readOutput('blog/page/' + lastPageNumber + '/index.html');
 
   assert.match(firstPage, /class="blog-featured mb-5"/);
   assert.match(firstPage, /Featured guide/);
   assert.match(
     firstPage,
-    /<h2 class="display-6 fw-bold">\s*<a href="\/blog\/airbnb-cleaning-cost-derby\/"/
+    new RegExp('<h2 class="display-6 fw-bold">\\s*<a href="/blog/' + latestSlug + '/"')
   );
   assert.equal(
     (firstPage.match(/<article class="blog-card h-100">/g) || []).length,
@@ -107,10 +115,10 @@ test('blog archive features the latest post and paginates the remaining articles
   );
 
   assert.equal(
-    (fifthPage.match(/<article class="blog-card h-100">/g) || []).length,
-    1
+    (lastPage.match(/<article class="blog-card h-100">/g) || []).length,
+    publishedSources.length % 5 || 5
   );
-  assert.match(fifthPage, /aria-current="page" aria-label="Page 5"/);
+  assert.ok(lastPage.includes('aria-current="page" aria-label="Page ' + lastPageNumber + '"'));
 });
 
 test('article output contains complete SEO and conversion metadata', () => {
@@ -146,12 +154,12 @@ test('sitemap and RSS feed contain the published article', () => {
   assert.match(feed, /<rss version="2\.0"/);
 });
 
-test('the 2026 editorial collection contains 20 substantial new articles', () => {
+test('the editorial collection contains substantial articles with valid metadata', () => {
   const newArticles = readdirSync(sourcePostsRoot)
     .filter((filename) => filename.endsWith('.md'))
     .filter((filename) => filename !== originalArticle);
 
-  assert.equal(newArticles.length, 20);
+  assert.ok(newArticles.length >= 20);
 
   const slugs = new Set();
   for (const filename of newArticles) {
@@ -179,7 +187,8 @@ test('the 2026 editorial collection contains 20 substantial new articles', () =>
     assert.match(slug, /^[a-z0-9]+(?:-[a-z0-9]+)*$/, `${filename} slug`);
     assert.equal(slugs.has(slug), false, `${filename} slug must be unique`);
     slugs.add(slug);
-    assert.match(date, /^2026-(0[1-7])-\d{2}$/, `${filename} date`);
+    assert.match(date, /^\d{4}-\d{2}-\d{2}$/, `${filename} date`);
+    assert.ok(Date.parse(date) <= Date.now(), `${filename} must not be future-dated`);
     assert.match(frontmatter, /^draft: false$/m, `${filename} must be published`);
     assert.ok(wordCount >= 500, `${filename} must contain at least 500 words`);
     assert.ok(
@@ -194,12 +203,12 @@ test('the 2026 editorial collection contains 20 substantial new articles', () =>
   }
 });
 
-test('all 21 published articles are generated as indexable pages', () => {
+test('all published articles are generated as indexable pages', () => {
   const articleDirectories = readdirSync(resolve(outputRoot, 'blog'), {
     withFileTypes: true
   }).filter((entry) => entry.isDirectory() && entry.name !== 'page');
 
-  assert.equal(articleDirectories.length, 21);
+  assert.equal(articleDirectories.length, publishedSources.length);
   for (const entry of articleDirectories) {
     const htmlPath = resolve(outputRoot, 'blog', entry.name, 'index.html');
     assert.ok(existsSync(htmlPath), `${entry.name} must have an index page`);
@@ -216,7 +225,7 @@ test('every published article has a unique optimized editorial image', () => {
   );
   const images = new Set();
 
-  assert.equal(articles.length, 21);
+  assert.equal(articles.length, publishedSources.length);
 
   for (const filename of articles) {
     const source = readFileSync(resolve(sourcePostsRoot, filename), 'utf8');
@@ -247,4 +256,33 @@ test('draft source and Eleventy internals are not published', () => {
   assert.equal(existsSync(resolve(outputRoot, 'src')), false);
   assert.equal(existsSync(resolve(outputRoot, 'package.json')), false);
   assert.equal(existsSync(resolve(outputRoot, '.pages.yml')), false);
+});
+
+test('weekly catch-up covers every Friday from 31 July through 23 October', () => {
+  const start = Date.parse('2026-07-31');
+  const end = Date.parse('2026-10-23');
+  const weekly = publishedSources.filter(({ source }) => {
+    const date = Date.parse(source.match(/^date: (.+)$/m)[1]);
+    return date >= start && date <= end;
+  });
+  assert.equal(weekly.length, 13);
+  const sitemap = readOutput('sitemap.xml');
+  const feed = readOutput('feed.xml');
+  for (let day = start; day <= end; day += 7 * 86400000) {
+    const date = new Date(day).toISOString().slice(0, 10);
+    const matches = weekly.filter(({ source }) => source.includes('date: ' + date + '\n'));
+    assert.equal(matches.length, 1, date + ' needs exactly one article');
+    const source = matches[0].source;
+    const slug = source.match(/^slug: (.+)$/m)[1];
+    assert.match(source, /^updated: 2026-10-25$/m);
+    assert.ok(sitemap.includes('/blog/' + slug + '/'));
+    assert.ok(feed.includes('/blog/' + slug + '/'));
+    const html = readOutput('blog/' + slug + '/index.html');
+    assert.ok(html.includes('AI-generated editorial illustration.'));
+    for (const [, target] of source.matchAll(/\]\((\/[^)]+)\)/g)) {
+      const path = target.split('?')[0];
+      const file = path.endsWith('/') ? path + 'index.html' : path;
+      assert.ok(existsSync(resolve(outputRoot, file.slice(1))), slug + ' link ' + target);
+    }
+  }
 });
