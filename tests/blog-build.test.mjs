@@ -270,7 +270,9 @@ test('weekly catch-up covers every Friday from 31 July through 23 October', () =
   const feed = readOutput('feed.xml');
   for (let day = start; day <= end; day += 7 * 86400000) {
     const date = new Date(day).toISOString().slice(0, 10);
-    const matches = weekly.filter(({ source }) => source.includes('date: ' + date + '\n'));
+    const matches = weekly.filter(({ source }) =>
+      source.match(/^date: (.+)$/m)?.[1]?.trim() === date
+    );
     assert.equal(matches.length, 1, date + ' needs exactly one article');
     const source = matches[0].source;
     const slug = source.match(/^slug: (.+)$/m)[1];
